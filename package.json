@@ -16,8 +16,9 @@
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production babel src --out-dir dist --extensions \".ts\" --source-maps inline",
+    "docs": "typedoc --out docs src",
     "lint": "eslint .",
-    "test": "yarn tsc && node test/run.js && yarn build",
+    "test": "yarn tsc && node test/run.js && yarn build && yarn doc",
     "ts": "tsc"
   },
   "main": "./lib",
@@ -41,6 +42,7 @@
     "jest-cli": "^24.1.0",
     "should": "^13.2.3",
     "sinon": "^7.2.3",
+    "typedoc": "^0.14.2",
     "typescript": "^3.3.3"
   },
   "typings": "typings/index.d.ts",
