@@ -3,7 +3,6 @@
  */
 
 import { EventEmitter } from 'events';
-
 import { spawn } from 'child_process';
 import path from 'path';
 import fs from 'fs';
@@ -29,7 +28,7 @@ class Option {
 
   long: string;
 
-  description: string
+  description: string;
 
   constructor(flags: string, description: string) {
     this.flags = flags;
@@ -37,7 +36,9 @@ class Option {
     this.optional = flags.includes('[');
     this.bool = !flags.includes('-no-');
     const parsedFlags = flags.split(/[ ,|]+/);
-    if (parsedFlags.length > 1 && !/^[[<]/.test(parsedFlags[1])) this.short = parsedFlags.shift();
+    if (parsedFlags.length > 1 && !/^[[<]/.test(parsedFlags[1])) {
+      this.short = parsedFlags.shift();
+    }
     this.long = parsedFlags.shift();
     this.description = description || '';
   }
@@ -53,7 +54,6 @@ class Option {
    * Return option name, in a camelcase format that can be used
    * as a object attribute key.
    */
-
   private attributeName(): string {
     return camelcase(this.name());
   }
@@ -153,9 +153,7 @@ class Command extends EventEmitter {
    * @param {String} name
    * @param {String} [desc] for git-style sub-commands
    * @return {Command} the new command
-   * @api public
    */
-
   public command(name: string, desc: string, opts: Object): Command {
     if (typeof desc === 'object' && desc !== null) {
       opts = desc;
@@ -245,10 +243,8 @@ class Command extends EventEmitter {
    *
    * @param {Function} fn
    * @return {Command} for chaining
-   * @api public
    */
-
-  action(fn) {
+  action(fn: Function): Command {
     const self = this;
     const listener = (args = [], unknown = []) => {
       const parsed = self.parseOptions(unknown);
@@ -342,10 +338,13 @@ class Command extends EventEmitter {
    * @param {Function|*} [fn] or default
    * @param {*} [defaultValue]
    * @return {Command} for chaining
-   * @api public
    */
-
-  option(flags, description, fn, defaultValue) {
+  option(
+    flags: Array<string>,
+    description: string,
+    fn: Function,
+    defaultValue: any
+  ): Command {
     const self = this;
     const option = new Option(flags, description);
     const oname = option.name();
@@ -412,9 +411,8 @@ class Command extends EventEmitter {
    *
    * @param {Boolean} arg if `true` or omitted, no error will be thrown
    * for unknown options.
-   * @api public
    */
-  allowUnknownOption(arg) {
+  public allowUnknownOption(arg: boolean) {
     this._allowUnknownOption = arguments.length === 0 || arg;
     return this;
   }
@@ -423,10 +421,8 @@ class Command extends EventEmitter {
    * Define completionRules which will later be used by autocomplete to generate appropriate response
    *
    * @param {Object} completion rules
-   * @api public
    */
-
-  complete(rules) {
+  public complete(rules: Object) {
     // merge options
     // this should ensure this._completionRules are always in shape
     if (rules.options) {
@@ -447,10 +443,8 @@ class Command extends EventEmitter {
    * Test if any complete rules has been defined for current command or its subcommands.
    *
    * @return {Boolean}
-   * @api private
    */
-
-  hasCompletionRules() {
+  private hasCompletionRules(): boolean {
     function isEmptyRule({ options, args }) {
       return (
         Object.keys(options).length === 0 && Object.keys(args).length === 0
@@ -468,11 +462,8 @@ class Command extends EventEmitter {
   /**
    * Handle autocomplete if command args starts with special options.
    * It will exit current process after successful processing.
-   *
-   * @param {Array} process.argv
    */
-
-  autocomplete(argv) {
+  autocomplete(argv: Array<string>) {
     const RESERVED_STARTING_KEYWORDS = [
       '--completion',
       '--completion-fish',
@@ -505,10 +496,8 @@ class Command extends EventEmitter {
    * Handle omelette complete event
    *
    * @param {Object} omelette event which contains fragment, line, reply info
-   *
-   * @api private
    */
-  autocompleteHandleEvent(event) {
+  private autocompleteHandleEvent(event: Object) {
     if (this.commands.length > 0) {
       // sub command style
       if (event.fragment === 1) {
@@ -551,9 +540,7 @@ class Command extends EventEmitter {
    *
    * @param {Array} typed args
    * @return {Array} auto complete candidates
-   * @api private
    */
-
   private autocompleteCandidates(typedArgs: Array<string>): Array<string> {
     const completionRules = this.autocompleteNormalizeRules();
     const activeOption = autocompleteActiveOption(
@@ -607,7 +594,6 @@ class Command extends EventEmitter {
    * the internal presentation of completion rules is quite different from user input.
    *
    * @return {Object} normalized rules
-   * @api private
    */
   private autocompleteNormalizeRules(): Object {
     // supplement with important information including
@@ -654,9 +640,7 @@ class Command extends EventEmitter {
    *
    * @param {Array} argv
    * @return {Command} for chaining
-   * @api public
    */
-
   public parse(argv: Array<string>): Command {
     // trigger autocomplete first if some completion rules have been defined
     if (this.hasCompletionRules()) {
@@ -724,10 +708,12 @@ class Command extends EventEmitter {
    * @param {Array} argv
    * @param {Array} args
    * @param {Array} unknown
-   * @api private
    */
-
-  private executeSubCommand(argv: Array<string>, args: Array<string>, unknown: Array<any>) {
+  private executeSubCommand(
+    argv: Array<string>,
+    args: Array<string>,
+    unknown: Array<any>
+  ) {
     args = args.concat(unknown);
 
     if (!args.length) this.help();
@@ -824,9 +810,7 @@ class Command extends EventEmitter {
    *
    * @param {Array} args
    * @return {Array}
-   * @api private
    */
-
   private normalize(args: Array<string>): Array<string> {
     let ret = [];
     let arg;
@@ -871,9 +855,7 @@ class Command extends EventEmitter {
    *
    * @param {Array} args
    * @return {Command} for chaining
-   * @api private
    */
-
   private parseArgs(args: Array<string>, unknown: any): Command {
     let name;
 
@@ -908,9 +890,7 @@ class Command extends EventEmitter {
    *
    * @param {String} arg
    * @return {Option}
-   * @api private
    */
-
   private optionFor(arg: String): Option {
     for (let i = 0, len = this.options.length; i < len; ++i) {
       if (this.options[i].is(arg)) {
@@ -925,10 +905,8 @@ class Command extends EventEmitter {
    *
    * @param {Array} argv
    * @return {Array}
-   * @api public
    */
-
-  parseOptions(argv) {
+  parseOptions(argv: Array<string>): Array<string> {
     const args = [];
     const len = argv.length;
     let literal;
@@ -1002,9 +980,8 @@ class Command extends EventEmitter {
    * Return an object containing options as key-value pairs
    *
    * @return {Object}
-   * @api public
    */
-  opts() {
+  opts(): Object {
     const result = {};
     const len = this.options.length;
 
@@ -1019,10 +996,8 @@ class Command extends EventEmitter {
    * Argument `name` is missing.
    *
    * @param {String} name
-   * @api private
    */
-
-  missingArgument(name) {
+  missingArgument(name: string) {
     console.error('error: missing required argument `%s`', name);
     process.exit(1);
   }
@@ -1032,10 +1007,8 @@ class Command extends EventEmitter {
    *
    * @param {String} option
    * @param {String} flag
-   * @api private
    */
-
-  optionMissingArgument({ flags }, flag) {
+  optionMissingArgument({ flags }: Option, flag: string) {
     if (flag) {
       console.error(
         'error: option `%s` argument missing, got `%s`',
@@ -1052,10 +1025,8 @@ class Command extends EventEmitter {
    * Unknown option `flag`.
    *
    * @param {String} flag
-   * @api private
    */
-
-  unknownOption(flag) {
+  unknownOption(flag: sting) {
     if (this._allowUnknownOption) return;
     console.error('error: unknown option `%s`', flag);
     process.exit(1);
@@ -1065,10 +1036,8 @@ class Command extends EventEmitter {
    * Variadic argument with `name` is not the last argument as required.
    *
    * @param {String} name
-   * @api private
    */
-
-  variadicArgNotLast(name) {
+  variadicArgNotLast(name: string) {
     console.error('error: variadic arguments must be last `%s`', name);
     process.exit(1);
   }
@@ -1082,10 +1051,8 @@ class Command extends EventEmitter {
    * @param {String} str
    * @param {String} [flags]
    * @return {Command} for chaining
-   * @api public
    */
-
-  version(str, flags) {
+  version(str: string, flags: string): Command {
     if (arguments.length === 0) return this._version;
     this._version = str;
     flags = flags || '-V, --version';
@@ -1105,10 +1072,8 @@ class Command extends EventEmitter {
    * @param {String} str
    * @param {Object} argsDescription
    * @return {String|Command}
-   * @api public
    */
-
-  description(str, argsDescription) {
+  description(str: string, argsDescription: Object): string | Command {
     if (arguments.length === 0) return this._description;
     this._description = str;
     this._argsDescription = argsDescription;
@@ -1120,10 +1085,8 @@ class Command extends EventEmitter {
    *
    * @param {String} alias
    * @return {String|Command}
-   * @api public
    */
-
-  alias(alias) {
+  public alias(alias: string): string | Command {
     let command = this;
     if (this.commands.length !== 0) {
       command = this.commands[this.commands.length - 1];
@@ -1143,10 +1106,8 @@ class Command extends EventEmitter {
    *
    * @param {String} str
    * @return {String|Command}
-   * @api public
    */
-
-  usage(str) {
+  usage(str: string): string | Command {
     const args = this._args.map(arg => humanReadableArgName(arg));
 
     const usage = `[options]${this.commands.length ? ' [command]' : ''}${
@@ -1164,10 +1125,8 @@ class Command extends EventEmitter {
    *
    * @param {String} str
    * @return {String|Command}
-   * @api public
    */
-
-  name(str) {
+  name(str: string) {
     if (arguments.length === 0) return this._name;
     this._name = str;
     return this;
@@ -1177,10 +1136,8 @@ class Command extends EventEmitter {
    * Return prepared commands.
    *
    * @return {Array}
-   * @api private
    */
-
-  prepareCommands() {
+  prepareCommands(): Array<string> {
     return this.commands
       .filter(({ _noHelp }) => !_noHelp)
       .map(cmd => {
@@ -1200,9 +1157,7 @@ class Command extends EventEmitter {
    * Return the largest command length.
    *
    * @return {Number}
-   * @api private
    */
-
   largestCommandLength() {
     const commands = this.prepareCommands();
     return commands.reduce(
@@ -1215,10 +1170,8 @@ class Command extends EventEmitter {
    * Return the largest option length.
    *
    * @return {Number}
-   * @api private
    */
-
-  largestOptionLength() {
+  private largestOptionLength(): number {
     const options = [].slice.call(this.options);
     options.push({
       flags: '-h, --help'
@@ -1230,10 +1183,8 @@ class Command extends EventEmitter {
    * Return the largest arg length.
    *
    * @return {Number}
-   * @api private
    */
-
-  largestArgLength() {
+  private largestArgLength(): number {
     return this._args.reduce((max, { name }) => Math.max(max, name.length), 0);
   }
 
@@ -1241,10 +1192,8 @@ class Command extends EventEmitter {
    * Return the pad width.
    *
    * @return {Number}
-   * @api private
    */
-
-  padWidth() {
+  private padWidth(): number {
     let width = this.largestOptionLength();
     if (this._argsDescription && this._args.length) {
       if (this.largestArgLength() > width) {
@@ -1265,10 +1214,8 @@ class Command extends EventEmitter {
    * Return help for options.
    *
    * @return {String}
-   * @api private
    */
-
-  optionHelp() {
+  private optionHelp(): string {
     const width = this.padWidth();
 
     // Append the help information
@@ -1289,10 +1236,8 @@ class Command extends EventEmitter {
    * Return command help documentation.
    *
    * @return {String}
-   * @api private
    */
-
-  commandHelp() {
+  private commandHelp(): string {
     if (!this.commands.length) return '';
 
     const commands = this.prepareCommands();
@@ -1315,10 +1260,8 @@ class Command extends EventEmitter {
    * Return program help documentation.
    *
    * @return {String}
-   * @api private
    */
-
-  helpInformation() {
+  private helpInformation(): string {
     let desc = [];
     if (this._description) {
       desc = [this._description, ''];
@@ -1360,11 +1303,8 @@ class Command extends EventEmitter {
 
   /**
    * Output help information for this command
-   *
-   * @api public
    */
-
-  outputHelp(cb) {
+  public outputHelp(cb) {
     if (!cb) {
       cb = passthru => passthru;
     }
@@ -1374,11 +1314,8 @@ class Command extends EventEmitter {
 
   /**
    * Output help information and exit.
-   *
-   * @api public
    */
-
-  help(cb) {
+  public help(cb) {
     this.outputHelp(cb);
     process.exit();
   }
@@ -1389,9 +1326,7 @@ class Command extends EventEmitter {
  *
  * @param {String} flag
  * @return {String}
- * @api private
  */
-
 function camelcase(flag) {
   return flag
     .split('-')
@@ -1404,10 +1339,8 @@ function camelcase(flag) {
  * @param {String} str
  * @param {Number} width
  * @return {String}
- * @api private
  */
-
-function pad(str, width) {
+function pad(str: string, width: number): string {
   const len = Math.max(0, width - str.length);
   return str + Array(len + 1).join(' ');
 }
@@ -1417,10 +1350,8 @@ function pad(str, width) {
  *
  * @param {Command} command to output help for
  * @param {Array} array of options to search for -h or --help
- * @api private
  */
-
-function outputHelpIfNecessary(cmd, options = []) {
+function outputHelpIfNecessary(cmd: Command, options: Array<string> = []) {
   for (let i = 0; i < options.length; i++) {
     if (options[i] === '--help' || options[i] === '-h') {
       cmd.outputHelp();
@@ -1434,10 +1365,8 @@ function outputHelpIfNecessary(cmd, options = []) {
  *
  * @param {Object} arg
  * @return {String}
- * @api private
  */
-
-function humanReadableArgName({ name, variadic, required }) {
+function humanReadableArgName({ name, variadic, required }: Object): string {
   const nameOutput = name + (variadic === true ? '...' : '');
 
   return required ? `<${nameOutput}>` : `[${nameOutput}]`;
@@ -1449,10 +1378,11 @@ function humanReadableArgName({ name, variadic, required }) {
  * @param {Object} normalized option rules
  * @param {Array} typed args
  * @return {Object} active option if found, otherwise false
- * @api private
  */
-
-function autocompleteActiveOption(optionRules, typedArgs) {
+function autocompleteActiveOption(
+  optionRules: Object,
+  typedArgs: Array<string>
+): Object {
   if (typedArgs.length === 0) {
     return false;
   }
@@ -1479,10 +1409,12 @@ function autocompleteActiveOption(optionRules, typedArgs) {
  * @param {Array} normalized arg rules
  * @param {Array} typed args
  * @return {Object} active arg if found, otherwise false
- * @api private
  */
-
-function autocompleteActiveArg(optionRules, argRules, typedArgs) {
+function autocompleteActiveArg(
+  optionRules: Object,
+  argRules: Array<string>,
+  typedArgs: Array<string>
+): Object {
   if (argRules.length === 0) {
     return false;
   }
