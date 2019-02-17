@@ -1,13 +1,13 @@
-var program = require('../')
-  , sinon = require('sinon').sandbox.create()
-  , should = require('should');
+const sinon = require('sinon').sandbox.create();
+const should = require('should');
+const program = require('../');
 
 program
   .command('clone <url>')
   .option('--debug-level <level>', 'debug level')
   .complete({
     options: {
-      '--debug-level': ['info', 'error'],
+      '--debug-level': ['info', 'error']
     },
     arguments: {
       url: ['https://github.com/1', 'https://github.com/2']
@@ -20,7 +20,7 @@ program
   .option('--debug-level <level>', 'debug level')
   .complete({
     options: {
-      '--debug-level': ['info', 'error'],
+      '--debug-level': ['info', 'error']
     },
     arguments: {
       file1: ['file1.c', 'file11.c'],
@@ -30,78 +30,67 @@ program
 
 program.hasCompletionRules().should.be.true();
 
-var rootReply = sinon.spy();
+const rootReply = sinon.spy();
 
 program.autocompleteHandleEvent({
   reply: rootReply,
   fragment: 1,
-  line: "git",
+  line: 'git'
 });
 
 rootReply.calledOnce.should.be.true();
-rootReply.getCall(0).args[0].should.deepEqual([
-  'clone',
-  'add',
-  '--help'
-]);
+rootReply.getCall(0).args[0].should.deepEqual(['clone', 'add', '--help']);
 
-var cloneReply = sinon.spy();
+const cloneReply = sinon.spy();
 
 program.autocompleteHandleEvent({
   reply: cloneReply,
   fragment: 2,
-  line: "git clone",
+  line: 'git clone'
 });
 
 cloneReply.calledOnce.should.be.true();
-cloneReply.getCall(0).args[0].should.deepEqual([
-  '--debug-level',
-  'https://github.com/1',
-  'https://github.com/2'
-]);
+cloneReply
+  .getCall(0)
+  .args[0].should.deepEqual([
+    '--debug-level',
+    'https://github.com/1',
+    'https://github.com/2'
+  ]);
 
-var cloneWithOptionReply = sinon.spy();
+const cloneWithOptionReply = sinon.spy();
 
 program.autocompleteHandleEvent({
   reply: cloneWithOptionReply,
   fragment: 3,
-  line: "git clone --debug-level",
+  line: 'git clone --debug-level'
 });
 
 cloneWithOptionReply.calledOnce.should.be.true();
-cloneWithOptionReply.getCall(0).args[0].should.deepEqual([
-  'info',
-  'error'
-]);
+cloneWithOptionReply.getCall(0).args[0].should.deepEqual(['info', 'error']);
 
-var addReply = sinon.spy();
+const addReply = sinon.spy();
 
 program.autocompleteHandleEvent({
   reply: addReply,
   fragment: 2,
-  line: "git add",
+  line: 'git add'
 });
 
 addReply.calledOnce.should.be.true();
-addReply.getCall(0).args[0].should.deepEqual([
-  '-A',
-  '--debug-level',
-  'file1.c',
-  'file11.c'
-]);
+addReply
+  .getCall(0)
+  .args[0].should.deepEqual(['-A', '--debug-level', 'file1.c', 'file11.c']);
 
-var addWithArgReply = sinon.spy();
+const addWithArgReply = sinon.spy();
 
 program.autocompleteHandleEvent({
   reply: addWithArgReply,
   fragment: 3,
-  line: "git add file1.c",
+  line: 'git add file1.c'
 });
 
 addWithArgReply.calledOnce.should.be.true();
-addWithArgReply.getCall(0).args[0].should.deepEqual([
-  '-A',
-  '--debug-level',
-  'file2.c',
-  'file21.c',
-]);
+addWithArgReply
+  .getCall(0)
+  .args[0].should.deepEqual(['-A', '--debug-level', 'file2.c', 'file21.c']);

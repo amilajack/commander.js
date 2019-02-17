@@ -1,17 +1,15 @@
-var program = require('../')
-  , should = require('should');
+const should = require('should');
+const program = require('../');
 
 program
   .command('info [thing]')
   .alias('i')
-  .action(function () {
-  });
+  .action(function() {});
 
 program
   .command('save [file]')
   .alias('s')
-  .action(function() {
-  });
+  .action(function() {});
 
 program.parse(['node', 'test']);
 

@@ -2,8 +2,8 @@
  * Module dependencies.
  */
 
-var program = require('../')
-  , should = require('should');
+const should = require('should');
+const program = require('../');
 
 function parseRange(str) {
   return str.split('..').map(Number);
@@ -18,7 +18,9 @@ program
   .option('-u, --my-URL-count <n>', 'pass a float', parseFloat)
   .option('-r, --my-long-range <a..b>', 'pass a range', parseRange);
 
-program.parse('node test -i 5.5 -f 5.5 -m 6.5 -u 7.5 -n 15.99 -r 1..5'.split(' '));
+program.parse(
+  'node test -i 5.5 -f 5.5 -m 6.5 -u 7.5 -n 15.99 -r 1..5'.split(' ')
+);
 program.myInt.should.equal(5);
 program.myNum.should.equal(15.99);
 program.myFLOAT.should.equal(5.5);

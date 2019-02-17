@@ -1,5 +1,5 @@
-var program = require('../')
-  , should = require('should');
+const should = require('should');
+const program = require('../');
 
 program
   .version('0.0.1')
@@ -10,10 +10,19 @@ program
   .option('-c, --camel-case', 'convert to camelCase')
   .option('-q, --quux <quux>', 'add some quux');
 
-program.parse(['node', 'test', '--foo', '--bar', '--no-magic', '--camel-case', '--quux', 'value']);
+program.parse([
+  'node',
+  'test',
+  '--foo',
+  '--bar',
+  '--no-magic',
+  '--camel-case',
+  '--quux',
+  'value'
+]);
 program.opts.should.be.a.Function();
 
-var opts = program.opts();
+const opts = program.opts();
 opts.should.be.an.Object();
 opts.version.should.equal('0.0.1');
 opts.foo.should.be.true();

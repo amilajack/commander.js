@@ -2,8 +2,8 @@
  * Module dependencies.
  */
 
-var program = require('../')
-  , should = require('should');
+const should = require('should');
+const program = require('../');
 
 program
   .version('0.0.1')
@@ -12,7 +12,6 @@ program
   .option('-x, --xother', 'just some other option')
   .option('-y, --yother', 'just some other option')
   .option('-z, --zother', 'just some other option');
-
 
 program.parse(['node', 'test', '--cflags', '-DDEBUG', '-o', '-xyz']);
 program.should.have.property('cflags', '-DDEBUG');

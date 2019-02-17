@@ -2,10 +2,10 @@
  * Module dependencies.
  */
 
-var program = require('../')
-  , should = require('should');
+const should = require('should');
+const program = require('../');
 
-var val = "some cheese"
+let val = 'some cheese';
 program
   .name('test')
   .command('mycommand')
@@ -17,4 +17,3 @@ program
 program.parse(['node', 'test', 'mycommand', '--cheese', '']);
 
 val.should.equal('');
-

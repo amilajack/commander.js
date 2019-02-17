@@ -2,16 +2,16 @@
  * Top-level command syntax.
  */
 
-var program = require('../')
-  , should = require('should');
+const should = require('should');
+const program = require('../');
 
-var envValue = "";
-var cmdValue = "";
+let envValue = '';
+let cmdValue = '';
 
 program
   .version('0.0.1')
   .arguments('<cmd> [env]')
-  .action(function (cmd, env) {
+  .action(function(cmd, env) {
     cmdValue = cmd;
     envValue = env;
   })
@@ -20,11 +20,20 @@ program
   .option('-T, --no-tests', 'ignore test hook');
 
 program.parse(['node', 'test', '--config', 'conf']);
-program.config.should.equal("conf");
-cmdValue.should.equal("");
-envValue.should.equal("");
+program.config.should.equal('conf');
+cmdValue.should.equal('');
+envValue.should.equal('');
 
-program.parse(['node', 'test', '--config', 'conf1', 'setup', '--setup_mode', 'mode3', 'env1']);
-program.config.should.equal("conf1");
-cmdValue.should.equal("setup");
-envValue.should.equal("env1");
+program.parse([
+  'node',
+  'test',
+  '--config',
+  'conf1',
+  'setup',
+  '--setup_mode',
+  'mode3',
+  'env1'
+]);
+program.config.should.equal('conf1');
+cmdValue.should.equal('setup');
+envValue.should.equal('env1');

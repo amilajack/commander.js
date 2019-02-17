@@ -1,6 +1,6 @@
-var program = require('../')
-  , sinon = require('sinon').sandbox.create()
-  , should = require('should');
+const sinon = require('sinon').sandbox.create();
+const should = require('should');
+const program = require('../');
 
 sinon.stub(process, 'exit');
 sinon.stub(process.stdout, 'write');
@@ -11,6 +11,6 @@ program.name.should.be.a.Function();
 program.name().should.equal('foobar');
 program.description().should.equal('This is a test.');
 
-var output = process.stdout.write.args[0];
+const output = process.stdout.write.args[0];
 
 sinon.restore();

@@ -1,11 +1,11 @@
-var program = require('../')
-  , should = require('should');
+const should = require('should');
+const program = require('../');
 
-var val = false;
+let val = false;
 program
   .command('info [options]')
   .option('-C, --no-color', 'turn off color output')
-  .action(function () {
+  .action(function() {
     val = this.color;
   });
 

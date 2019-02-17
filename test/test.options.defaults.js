@@ -2,8 +2,8 @@
  * Module dependencies.
  */
 
-var program = require('../')
-  , should = require('should');
+const should = require('should');
+const program = require('../');
 
 program
   .version('0.0.1')
@@ -11,8 +11,16 @@ program
   .option('-o, --onions', 'Add onions?', true)
   .option('-v, --olives', 'Add olives? Sorry we only have black.', 'black')
   .option('-s, --no-sauce', 'Uh… okay')
-  .option('-r, --crust <type>', 'What kind of crust would you like?', 'hand-tossed')
-  .option('-c, --cheese [type]', 'optionally specify the type of cheese', 'mozzarella');
+  .option(
+    '-r, --crust <type>',
+    'What kind of crust would you like?',
+    'hand-tossed'
+  )
+  .option(
+    '-c, --cheese [type]',
+    'optionally specify the type of cheese',
+    'mozzarella'
+  );
 
 program.should.have.property('_name', '');
 

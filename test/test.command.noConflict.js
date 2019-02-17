@@ -1,6 +1,6 @@
-var program = require('../')
-  , sinon = require('sinon')
-  , should = require('should');
+const sinon = require('sinon');
+const should = require('should');
+const program = require('../');
 
 sinon.stub(process, 'exit');
 sinon.stub(process.stdout, 'write');

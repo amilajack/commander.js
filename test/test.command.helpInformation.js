@@ -1,12 +1,11 @@
-var program = require('../')
-  , sinon = require('sinon').sandbox.create()
-  , should = require('should');
-
+const sinon = require('sinon').sandbox.create();
+const should = require('should');
+const program = require('../');
 
 program.command('somecommand');
 program.command('anothercommand [options]');
 
-var expectedHelpInformation = [
+const expectedHelpInformation = [
   'Usage:  [options] [command]',
   '',
   'Options:',

@@ -15,9 +15,10 @@
     "url": "https://github.com/tj/commander.js.git"
   },
   "scripts": {
-    "lint": "eslint index.js",
-    "test": "node test/run.js && npm run test-typings",
-    "test-typings": "tsc -p tsconfig.json"
+    "build": "cross-env NODE_ENV=production babel src --out-dir dist --extensions \".ts\" --source-maps inline",
+    "lint": "eslint .",
+    "test": "yarn tsc && node test/run.js",
+    "ts": "tsc"
   },
   "main": "index",
   "files": [
@@ -28,13 +29,22 @@
     "omelette": "^0.4.12"
   },
   "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.3.3",
+    "@babel/preset-env": "^7.3.1",
     "@types/node": "^10.11.3",
-    "eslint": "^5.6.1",
+    "eslint": "^5.14.0",
+    "eslint-config-bliss": "^3.3.0",
+    "jest-cli": "^24.1.0",
     "should": "^13.2.3",
     "sinon": "^6.3.4",
-    "standard": "^12.0.1",
-    "ts-node": "^7.0.1",
-    "typescript": "^2.9.2"
+    "typescript": "^3.3.3"
   },
-  "typings": "typings/index.d.ts"
+  "typings": "typings/index.d.ts",
+  "eslintConfig": {
+    "extends": "bliss"
+  },
+  "babel": {
+    "presets": ["@babel/preset-env"]
+  }
 }

@@ -2,17 +2,26 @@
  * Module dependencies.
  */
 
-var program = require('../')
-  , should = require('should')
-  , util = require('util')
-  , programArgs = ['node', 'test', 'mycommand', 'arg0', 'arg1', 'arg2', 'arg3']
-  , requiredArg
-  , variadicArg;
+const should = require('should');
+const util = require('util');
+const program = require('../');
+
+const programArgs = [
+  'node',
+  'test',
+  'mycommand',
+  'arg0',
+  'arg1',
+  'arg2',
+  'arg3'
+];
+let requiredArg;
+let variadicArg;
 
 program
   .version('0.0.1')
   .command('mycommand <id> [variadicArg...]')
-  .action(function (arg0, arg1) {
+  .action(function(arg0, arg1) {
     requiredArg = arg0;
     variadicArg = arg1;
   });
@@ -29,20 +38,18 @@ program.args[1].should.eql(['arg1', 'arg2', 'arg3']);
 program
   .version('0.0.1')
   .command('mycommand <variadicArg...> [optionalArg]')
-  .action(function (arg0, arg1) {
-
-  });
+  .action(function(arg0, arg1) {});
 
 // Make sure we still catch errors with required values for options
-var consoleErrors = [];
-var oldProcessExit = process.exit;
-var oldConsoleError = console.error;
-var errorMessage;
+const consoleErrors = [];
+const oldProcessExit = process.exit;
+const oldConsoleError = console.error;
+let errorMessage;
 
-process.exit = function () {
+process.exit = function() {
   throw new Error(consoleErrors.join('\n'));
 };
-console.error = function () {
+console.error = function() {
   consoleErrors.push(util.format.apply(util, arguments));
 };
 

@@ -1,5 +1,5 @@
-var program = require('../')
-  , should = require('should');
+const should = require('should');
+const program = require('../');
 
 program.hasCompletionRules().should.be.false();
 
@@ -11,9 +11,13 @@ program
   .option('-m <mode>', 'mode')
   .complete({
     options: {
-      '--output': function() { return ['file1', 'file2'] },
+      '--output': function() {
+        return ['file1', 'file2'];
+      },
       '--debug-level': ['info', 'error'],
-      '-m': function(typedArgs) { return typedArgs; }
+      '-m': function(typedArgs) {
+        return typedArgs;
+      }
     },
     arguments: {
       filename: ['file1.c', 'file2.c']
@@ -50,90 +54,99 @@ program.autocompleteNormalizeRules().should.deepEqual({
       reply: program._completionRules.options['-m']
     }
   },
-  args: [
-    ['file1.c', 'file2.c']
-  ]
+  args: [['file1.c', 'file2.c']]
 });
 
-program.autocompleteCandidates([]).should.deepEqual([
-  '--verbose',
-  '-o',
-  '--output',
-  '--debug-level',
-  '-m',
-  'file1.c',
-  'file2.c'
-]);
+program
+  .autocompleteCandidates([])
+  .should.deepEqual([
+    '--verbose',
+    '-o',
+    '--output',
+    '--debug-level',
+    '-m',
+    'file1.c',
+    'file2.c'
+  ]);
 
-program.autocompleteCandidates(['--verbose']).should.deepEqual([
-  '-o',
-  '--output',
-  '--debug-level',
-  '-m',
-  'file1.c',
-  'file2.c'
-]);
+program
+  .autocompleteCandidates(['--verbose'])
+  .should.deepEqual([
+    '-o',
+    '--output',
+    '--debug-level',
+    '-m',
+    'file1.c',
+    'file2.c'
+  ]);
 
-program.autocompleteCandidates(['-o']).should.deepEqual([
-  'file1',
-  'file2'
-]);
+program.autocompleteCandidates(['-o']).should.deepEqual(['file1', 'file2']);
 
-program.autocompleteCandidates(['--output']).should.deepEqual([
-  'file1',
-  'file2'
-]);
+program
+  .autocompleteCandidates(['--output'])
+  .should.deepEqual(['file1', 'file2']);
 
-program.autocompleteCandidates(['--debug-level']).should.deepEqual([
-  'info',
-  'error'
-]);
+program
+  .autocompleteCandidates(['--debug-level'])
+  .should.deepEqual(['info', 'error']);
 
-program.autocompleteCandidates(['-m']).should.deepEqual([
-  '-m'
-]);
+program.autocompleteCandidates(['-m']).should.deepEqual(['-m']);
 
-program.autocompleteCandidates(['--verbose', '-m']).should.deepEqual([
-  '--verbose',
-  '-m'
-]);
+program
+  .autocompleteCandidates(['--verbose', '-m'])
+  .should.deepEqual(['--verbose', '-m']);
 
-program.autocompleteCandidates([
-  '--verbose',
-  '-o', 'file1',
-  '--debug-level', 'info',
-  '-m', 'production'
-]).should.deepEqual([
-  'file1.c',
-  'file2.c'
-]);
+program
+  .autocompleteCandidates([
+    '--verbose',
+    '-o',
+    'file1',
+    '--debug-level',
+    'info',
+    '-m',
+    'production'
+  ])
+  .should.deepEqual(['file1.c', 'file2.c']);
 
 // nothing to complete
-program.autocompleteCandidates([
-  '--verbose',
-  '-o', 'file1',
-  '--debug-level', 'info',
-  '-m', 'production',
-  'file1.c'
-]).should.deepEqual([]);
+program
+  .autocompleteCandidates([
+    '--verbose',
+    '-o',
+    'file1',
+    '--debug-level',
+    'info',
+    '-m',
+    'production',
+    'file1.c'
+  ])
+  .should.deepEqual([]);
 
 // place arguments in different position
-program.autocompleteCandidates([
-  'file1.c',
-  '-o', 'file1',
-  '--debug-level', 'info',
-  '-m', 'production'
-]).should.deepEqual([
-  '--verbose'
-]);
+program
+  .autocompleteCandidates([
+    'file1.c',
+    '-o',
+    'file1',
+    '--debug-level',
+    'info',
+    '-m',
+    'production'
+  ])
+  .should.deepEqual(['--verbose']);
 
 // should handle the case
 // when provide more args than expected
-program.autocompleteCandidates([
-  'file1.c',
-  'file2.c',
-  '--verbose',
-  '-o', 'file1',
-  '--debug-level', 'info',
-  '-m', 'production'
-]).should.deepEqual([]);
+program
+  .autocompleteCandidates([
+    'file1.c',
+    'file2.c',
+    '--verbose',
+    '-o',
+    'file1',
+    '--debug-level',
+    'info',
+    '-m',
+    'production'
+  ])
+  .should.deepEqual([]);
