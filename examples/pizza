@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-var program = require('../');
+const program = require('../');
 
 program
   .version('0.0.1')
@@ -21,9 +21,7 @@ if (program.peppers) console.log('  - peppers');
 if (program.pineapple) console.log('  - pineapple');
 if (program.bbq) console.log('  - bbq');
 
-var cheese = true === program.cheese
-  ? 'marble'
-  : program.cheese || 'no';
+const cheese = program.cheese === true ? 'marble' : program.cheese || 'no';
 
 console.log('  - %s cheese', cheese);
 console.log(program.args);

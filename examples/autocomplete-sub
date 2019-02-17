@@ -8,7 +8,7 @@
  * eval "$(autocomplete-sub --completion)"
  */
 
-var program = require('..');
+const program = require('..');
 
 program
   .command('sub1 <arg1> <arg2>')
@@ -18,11 +18,15 @@ program
   .option('--description <desc>', 'specify description')
   .complete({
     options: {
-      '--name': function() { return ['kate', 'jim']; },
+      '--name': function() {
+        return ['kate', 'jim'];
+      },
       '--description': ['d1', 'd2']
     },
     arguments: {
-      arg1: function() { return ['a-1', 'a-2', 'a-3']; },
+      arg1() {
+        return ['a-1', 'a-2', 'a-3'];
+      },
       arg2: ['b-1', 'b-2']
     }
   });
@@ -35,11 +39,15 @@ program
   .option('--description <desc>', 'specify description')
   .complete({
     options: {
-      '--name': function() { return ['lucy', 'linda']; },
+      '--name': function() {
+        return ['lucy', 'linda'];
+      },
       '--description': ['db1', 'db2']
     },
     arguments: {
-      arg1: function() { return ['a-11', 'a-12']; },
+      arg1() {
+        return ['a-11', 'a-12'];
+      }
     }
   });
 

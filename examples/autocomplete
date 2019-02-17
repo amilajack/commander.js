@@ -10,7 +10,7 @@
  * And then you can try use tab completion after auto-complete command
  */
 
-var program = require('..');
+const program = require('..');
 
 program
   .arguments('<a> <b>')
@@ -19,11 +19,15 @@ program
   .option('--description <desc>', 'specify description')
   .complete({
     options: {
-      '--name': function() { return ['kate', 'jim']; },
+      '--name': function() {
+        return ['kate', 'jim'];
+      },
       '--description': ['desc1', 'desc2']
     },
     arguments: {
-      a: function() { return ['a-1', 'a-2']; },
+      a() {
+        return ['a-1', 'a-2'];
+      },
       b: ['b-1', 'b-2']
     }
   })

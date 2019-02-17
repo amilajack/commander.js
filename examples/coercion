@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-var program = require('../');
+const program = require('../');
 
 function range(val) {
   return val.split('..').map(Number);
@@ -32,7 +32,12 @@ program
   .option('-l, --list <items>', 'A list', list)
   .option('-o, --optional [value]', 'An optional value')
   .option('-c, --collect [value]', 'A repeatable value', collect, [])
-  .option('-v, --verbose', 'A value that can be increased', increaseVerbosity, 0)
+  .option(
+    '-v, --verbose',
+    'A value that can be increased',
+    increaseVerbosity,
+    0
+  )
   .parse(process.argv);
 
 console.log(' int: %j', program.integer);

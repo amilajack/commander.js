@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-var program = require('../');
+const program = require('../');
 
 program
   .version('0.0.1')
@@ -15,7 +15,7 @@ program
 // must be before .parse() since
 // node's emit() is immediate
 
-program.on('--help', function(){
+program.on('--help', function() {
   console.log('');
   console.log('Examples:');
   console.log('');

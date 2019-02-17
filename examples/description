@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-var program = require('../');
+const program = require('../');
 
 program
   .version('0.0.1')
@@ -15,4 +15,3 @@ program
   .parse(process.argv);
 
 if (!program.args.length) program.help();
-
