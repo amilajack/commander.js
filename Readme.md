@@ -254,9 +254,44 @@ You can enable `--harmony` option in two ways:
 * Use `#! /usr/bin/env node --harmony` in the sub-commands scripts. Note some os version don’t support this pattern.
 * Use the `--harmony` option when call the command, like `node --harmony examples/pm publish`. The `--harmony` option will be preserved when spawning sub-command process.
 
+## Autocomplete
+
+commander has autocomplete capability builtin, and you can enable it by the following steps:
+
+1. Declare the candidate values for each option and arg. The candidate value can be an array or a function that receives typedArgs (an array of already typed command line string split by empty space) and returns an array of candidates.
+
+```js
+program
+  .arguments('<a> <b>')
+  .option('--verbose', 'verbose')
+  .option('-n, --name <name>', 'specify name')
+  .option('--description <desc>', 'specify description')
+  .complete({
+    options: {
+      '--name': function(typedArgs) { return ['kate', 'jim']; },
+      '--description': ['desc1', 'desc2']
+    },
+    arguments: {
+      a: function(typedArgs) { return ['a-1', 'a-2']; },
+      b: ['b-1', 'b-2']
+    }
+  });
+```
+
+2. Ask your command line user to enable autocompletion for current session by executing the following command.
+For persistent support, we can recommend adding the command to their shell initialization file such as .bashrc or .zshrc etc.
+
+```
+# for zsh or bash
+eval "$(<cli-program-name> --completion)"
+
+# for fish shell
+<cli-program-name> --completion-fish | source
+```
+
 ## Automated --help
 
- The help information is auto-generated based on the information commander already knows about your program, so the following `--help` info is for free:
+The help information is auto-generated based on the information commander already knows about your program, so the following `--help` info is for free:
 
 ```  
 $ ./examples/pizza --help
