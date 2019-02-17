@@ -16,6 +16,7 @@ import fs from 'fs';
  */
 
 class Option {
+
   flags: string;
 
   required: boolean;
@@ -29,6 +30,8 @@ class Option {
   long: string;
 
   description: string;
+
+  defaultValue: string;
 
   constructor(flags: string, description: string) {
     this.flags = flags;
@@ -54,7 +57,7 @@ class Option {
    * Return option name, in a camelcase format that can be used
    * as a object attribute key.
    */
-  private attributeName(): string {
+  public attributeName(): string {
     return camelcase(this.name());
   }
 
@@ -69,7 +72,7 @@ class Option {
    * Returns number of args that are expected by the option.
    * Can only be 0 or 1.
    */
-  private arity(): number {
+  public arity(): number {
     return this.required || this.optional ? 1 : 0;
   }
 }
@@ -80,15 +83,42 @@ class Option {
 
 class Command extends EventEmitter {
 
-  commands: Array<string> = [];
+  public commands: Array<Command> = [];
 
-  options: Array<string> = [];
+  public options: Array<Option> = [];
+
+  public executables: boolean;
+
+  public defaultExecutable: string;
+
+  public parent: Command;
+
+  public args: Array<string>;
+
+  /**
+   * The running node process from running a subcommand executable
+   */
+  public runningCommand: () => void;
+
+  public rawArgs: Array<string>;
+
+  private _noHelp: boolean;
 
   private _execs: Object = {};
+
+  private _argsDescription: Object;
+
+  private _alias: string;
 
   private _allowUnknownOption: boolean = false;
 
   private _args: Array<string> = [];
+
+  private _version: string;
+
+  private _description: string;
+
+  private _usage: string;
 
   private _name: string;
 
@@ -163,7 +193,7 @@ class Command extends EventEmitter {
    * @param {String} [desc] for git-style sub-commands
    * @return {Command} the new command
    */
-  public command(name: string, desc: string, opts: Object): Command {
+  public command(name: string, desc: string, opts: { isDefault: boolean, noHelp: boolean }): Command {
     if (typeof desc === 'object' && desc !== null) {
       opts = desc;
       desc = null;
@@ -362,8 +392,8 @@ class Command extends EventEmitter {
     // default as 3rd arg
     if (typeof fn !== 'function') {
       if (fn instanceof RegExp) {
-        const regex = fn;
-        fn = (val, def) => {
+        const regex: RegExp = fn;
+        fn = (val: any, def: any) => {
           const m = regex.exec(val);
           return m ? m[0] : def;
         };
@@ -431,7 +461,7 @@ class Command extends EventEmitter {
    *
    * @param {Object} completion rules
    */
-  public complete(rules: Object) {
+  public complete(rules: { options: {}, arguments: Array<string>, args: Array<string> }) {
     // merge options
     // this should ensure this._completionRules are always in shape
     if (rules.options) {
@@ -490,7 +520,7 @@ class Command extends EventEmitter {
 
       const completion = omelette(executableName);
 
-      completion.on('complete', (f, event) => {
+      completion.on('complete', (f: Function, event: Event) => {
         self.autocompleteHandleEvent(event);
       });
 
@@ -506,7 +536,7 @@ class Command extends EventEmitter {
    *
    * @param {Object} omelette event which contains fragment, line, reply info
    */
-  private autocompleteHandleEvent(event: Object) {
+  private autocompleteHandleEvent(event: Event) {
     if (this.commands.length > 0) {
       // sub command style
       if (event.fragment === 1) {
@@ -604,7 +634,7 @@ class Command extends EventEmitter {
    *
    * @return {Object} normalized rules
    */
-  private autocompleteNormalizeRules(): Object {
+  private autocompleteNormalizeRules(): { options: {} } {
     // supplement with important information including
     // option arity and sibling
     const rawRules = this._completionRules;
@@ -794,7 +824,7 @@ class Command extends EventEmitter {
       });
     });
     proc.on('close', process.exit.bind(process));
-    proc.on('error', ({ code }) => {
+    proc.on('error', ({ code }: { code: string }) => {
       if (code === 'ENOENT') {
         console.error('error: %s(1) does not exist, try --help', bin);
       } else if (code === 'EACCES') {
@@ -885,7 +915,7 @@ class Command extends EventEmitter {
       }
       if (
         this.commands.length === 0 &&
-        this._args.filter(({ required }) => required).length === 0
+        this._args.filter(({ required }: { required: boolea }) => required).length === 0
       ) {
         this.emit('command:*');
       }
@@ -915,7 +945,7 @@ class Command extends EventEmitter {
    * @param {Array} argv
    * @return {Array}
    */
-  parseOptions(argv: Array<string>): Array<string> {
+  parseOptions(argv: Array<string>): { args: Array<string>, unknown: Array<string> } {
     const args = [];
     const len = argv.length;
     let literal;
@@ -1167,7 +1197,7 @@ class Command extends EventEmitter {
    *
    * @return {Number}
    */
-  largestCommandLength() {
+  private largestCommandLength() {
     const commands = this.prepareCommands();
     return commands.reduce(
       (max, command) => Math.max(max, command[0].length),
@@ -1185,7 +1215,7 @@ class Command extends EventEmitter {
     options.push({
       flags: '-h, --help'
     });
-    return options.reduce((max, { flags }) => Math.max(max, flags.length), 0);
+    return options.reduce((max: number, { flags }: { flags: string }) => Math.max(max, flags.length), 0);
   }
 
   /**
@@ -1194,7 +1224,7 @@ class Command extends EventEmitter {
    * @return {Number}
    */
   private largestArgLength(): number {
-    return this._args.reduce((max, { name }) => Math.max(max, name.length), 0);
+    return this._args.reduce((max: number, { name }: { name: string} ) => Math.max(max, name.length), 0);
   }
 
   /**
@@ -1271,7 +1301,7 @@ class Command extends EventEmitter {
    * @return {String}
    */
   private helpInformation(): string {
-    let desc = [];
+    let desc: Array<string> = [];
     if (this._description) {
       desc = [this._description, ''];
 
@@ -1293,7 +1323,7 @@ class Command extends EventEmitter {
     }
     const usage = [`Usage: ${cmdName} ${this.usage()}`, ''];
 
-    let cmds = [];
+    let cmds: Array<string> = [];
     const commandHelp = this.commandHelp();
     if (commandHelp) cmds = [commandHelp];
 
@@ -1313,7 +1343,7 @@ class Command extends EventEmitter {
   /**
    * Output help information for this command
    */
-  public outputHelp(cb) {
+  public outputHelp(cb: () => void) {
     if (!cb) {
       cb = passthru => passthru;
     }
@@ -1324,7 +1354,7 @@ class Command extends EventEmitter {
   /**
    * Output help information and exit.
    */
-  public help(cb) {
+  public help(cb: () => void) {
     this.outputHelp(cb);
     process.exit();
   }
