@@ -46,7 +46,7 @@ class Option {
   /**
    * Return option name.
    */
-  private name(): string {
+  name(): string {
     return this.long.replace('--', '').replace('no-', '');
   }
 
@@ -79,12 +79,21 @@ class Option {
  */
 
 class Command extends EventEmitter {
+
   commands: Array<string> = [];
+
   options: Array<string> = [];
+
   private _execs: Object = {};
+
   private _allowUnknownOption: boolean = false;
+
   private _args: Array<string> = [];
+
   private _name: string;
+
+  private _versionOptionName: string;
+
   private _completionRules = {
     options: {},
     args: {}
@@ -118,24 +127,24 @@ class Command extends EventEmitter {
    *      program
    *        .command('setup')
    *        .description('run remote setup commands')
-   *        .action(function() {
+   *        .action(() => {
    *          console.log('setup');
    *        });
    *
    *      program
    *        .command('exec <cmd>')
    *        .description('run the given remote command')
-   *        .action(function(cmd) {
+   *        .action((cmd) => {
    *          console.log('exec "%s"', cmd);
    *        });
    *
    *      program
    *        .command('teardown <dir> [otherDirs...]')
    *        .description('run teardown commands')
-   *        .action(function(dir, otherDirs) {
+   *        .action((dir, otherDirs) => {
    *          console.log('dir "%s"', dir);
    *          if (otherDirs) {
-   *            otherDirs.forEach(function (oDir) {
+   *            otherDirs.forEach((oDir) => {
    *              console.log('dir "%s"', oDir);
    *            });
    *          }
@@ -144,7 +153,7 @@ class Command extends EventEmitter {
    *      program
    *        .command('*')
    *        .description('deploy the given env')
-   *        .action(function(env) {
+   *        .action((env) => {
    *          console.log('deploying "%s"', env);
    *        });
    *
@@ -237,7 +246,7 @@ class Command extends EventEmitter {
    *      program
    *        .command('help')
    *        .description('display verbose help')
-   *        .action(function() {
+   *        .action(() => {
    *           // output help here
    *        });
    *
@@ -340,7 +349,7 @@ class Command extends EventEmitter {
    * @return {Command} for chaining
    */
   option(
-    flags: Array<string>,
+    flags: string,
     description: string,
     fn: Function,
     defaultValue: any
@@ -1026,7 +1035,7 @@ class Command extends EventEmitter {
    *
    * @param {String} flag
    */
-  unknownOption(flag: sting) {
+  unknownOption(flag: string) {
     if (this._allowUnknownOption) return;
     console.error('error: unknown option `%s`', flag);
     process.exit(1);
@@ -1126,7 +1135,7 @@ class Command extends EventEmitter {
    * @param {String} str
    * @return {String|Command}
    */
-  name(str: string) {
+  name(str: string): string | Command {
     if (arguments.length === 0) return this._name;
     this._name = str;
     return this;
@@ -1327,10 +1336,10 @@ class Command extends EventEmitter {
  * @param {String} flag
  * @return {String}
  */
-function camelcase(flag) {
+function camelcase(flag: string): string {
   return flag
     .split('-')
-    .reduce((str, word) => str + word[0].toUpperCase() + word.slice(1));
+    .reduce((str: string, word: string) => str + word[0].toUpperCase() + word.slice(1));
 }
 
 /**
@@ -1366,7 +1375,7 @@ function outputHelpIfNecessary(cmd: Command, options: Array<string> = []) {
  * @param {Object} arg
  * @return {String}
  */
-function humanReadableArgName({ name, variadic, required }: Object): string {
+function humanReadableArgName({ name, variadic, required }: { name: string, variadic: boolean, required: boolean }): string {
   const nameOutput = name + (variadic === true ? '...' : '');
 
   return required ? `<${nameOutput}>` : `[${nameOutput}]`;

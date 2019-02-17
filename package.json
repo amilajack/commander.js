@@ -17,10 +17,10 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production babel src --out-dir dist --extensions \".ts\" --source-maps inline",
     "lint": "eslint .",
-    "test": "yarn tsc && node test/run.js",
+    "test": "yarn tsc && node test/run.js && yarn build",
     "ts": "tsc"
   },
-  "main": "index",
+  "main": "./lib",
   "files": [
     "index.js",
     "typings/index.d.ts"
@@ -31,8 +31,11 @@
   "devDependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.3.3",
+    "@babel/plugin-proposal-class-properties": "^7.3.3",
     "@babel/preset-env": "^7.3.1",
+    "@babel/preset-typescript": "^7.3.3",
     "@types/node": "^11.9.4",
+    "cross-env": "^5.2.0",
     "eslint": "^5.14.0",
     "eslint-config-bliss": "^3.3.0",
     "jest-cli": "^24.1.0",
@@ -45,6 +48,24 @@
     "extends": "bliss"
   },
   "babel": {
-    "presets": ["@babel/preset-env"]
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "node": 10
+          }
+        }
+      ],
+      [
+        "@babel/preset-typescript",
+        {
+          "allExtensions": true
+        }
+      ]
+    ],
+    "plugins": [
+      "@babel/plugin-proposal-class-properties"
+    ]
   }
 }
