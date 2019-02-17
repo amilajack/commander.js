@@ -12,8 +12,9 @@
 
 
 ## Installation
-
-    $ npm install commander --save
+```bash
+$ npm install commander --save
+```
 
 ## Option parsing
 
@@ -26,7 +27,7 @@ Options with commander are defined with the `.option()` method, also serving as 
  * Module dependencies.
  */
 
-var program = require('commander');
+const program = require('commander');
 
 program
   .version('0.1.0')
@@ -54,7 +55,7 @@ Note that multi-word options starting with `--no` prefix negate the boolean valu
  * Module dependencies.
  */
 
-var program = require('commander');
+const program = require('commander');
 
 program
   .option('--no-sauce', 'Remove sauce')
@@ -100,12 +101,12 @@ You can attach options to a command.
 ```js
 #!/usr/bin/env node
 
-var program = require('commander');
+const program = require('commander');
 
 program
   .command('rm <dir>')
   .option('-r, --recursive', 'Remove recursively')
-  .action(function (dir, cmd) {
+  .action((dir, cmd) => {
     console.log('remove ' + dir + (cmd.recursive ? ' recursively' : ''))
   })
 
@@ -181,15 +182,15 @@ console.log(' drink: %j', program.drink);
  * Module dependencies.
  */
 
-var program = require('commander');
+const program = require('commander');
 
 program
   .version('0.1.0')
   .command('rmdir <dir> [otherDirs...]')
-  .action(function (dir, otherDirs) {
+  .action((dir, otherDirs) => {
     console.log('rmdir %s', dir);
     if (otherDirs) {
-      otherDirs.forEach(function (oDir) {
+      otherDirs.forEach((oDir) => {
         console.log('rmdir %s', oDir);
       });
     }
@@ -206,14 +207,14 @@ program.parse(process.argv);
 ```js
 #!/usr/bin/env node
 
-var program = require('commander');
+const program = require('commander');
 
 program
   .version('0.1.0')
   .arguments('<cmd> [env]')
-  .action(function (cmd, env) {
-     cmdValue = cmd;
-     envValue = env;
+  .action((cmd, env) => {
+    cmdValue = cmd;
+    envValue = env;
   });
 
 program.parse(process.argv);
@@ -231,7 +232,7 @@ Angled brackets (e.g. `<cmd>`) indicate required input. Square brackets (e.g. `[
 
 ```js
 // file: ./examples/pm
-var program = require('commander');
+const program = require('commander');
 
 program
   .version('0.1.0')
@@ -268,11 +269,11 @@ program
   .option('--description <desc>', 'specify description')
   .complete({
     options: {
-      '--name': function(typedArgs) { return ['kate', 'jim']; },
+      '--name': (typedArgs) => ['kate', 'jim'],
       '--description': ['desc1', 'desc2']
     },
     arguments: {
-      a: function(typedArgs) { return ['a-1', 'a-2']; },
+      a: (typedArgs) => ['a-1', 'a-2'],
       b: ['b-1', 'b-2']
     }
   });
@@ -281,7 +282,7 @@ program
 2. Ask your command line user to enable autocompletion for current session by executing the following command.
 For persistent support, we can recommend adding the command to their shell initialization file such as .bashrc or .zshrc etc.
 
-```
+```bash
 # for zsh or bash
 eval "$(<cli-program-name> --completion)"
 
@@ -293,7 +294,7 @@ eval "$(<cli-program-name> --completion)"
 
 The help information is auto-generated based on the information commander already knows about your program, so the following `--help` info is for free:
 
-```  
+```
 $ ./examples/pizza --help
 Usage: pizza [options]
 
@@ -325,7 +326,7 @@ Options:
  * Module dependencies.
  */
 
-var program = require('commander');
+const program = require('commander');
 
 program
   .version('0.1.0')
@@ -336,7 +337,7 @@ program
 // must be before .parse() since
 // node's emit() is immediate
 
-program.on('--help', function(){
+program.on('--help', () => {
   console.log('')
   console.log('Examples:');
   console.log('  $ custom-help --help');
@@ -373,8 +374,8 @@ Optional callback cb allows post-processing of help text before it is displayed.
 If you want to display help by default (e.g. if no command was provided), you can use something like:
 
 ```js
-var program = require('commander');
-var colors = require('colors');
+const program = require('commander');
+const colors = require('colors');
 
 program
   .version('0.1.0')
@@ -400,12 +401,12 @@ function make_red(txt) {
  You can execute custom actions by listening to command and option events.
 
 ```js
-program.on('option:verbose', function () {
+program.on('option:verbose', () => {
   process.env.VERBOSE = this.verbose;
 });
 
 // error on unknown commands
-program.on('command:*', function () {
+program.on('command:*', () => {
   console.error('Invalid command: %s\nSee --help for a list of available commands.', program.args.join(' '));
   process.exit(1);
 });
@@ -414,7 +415,7 @@ program.on('command:*', function () {
 ## Examples
 
 ```js
-var program = require('commander');
+const program = require('commander');
 
 program
   .version('0.1.0')
@@ -426,8 +427,8 @@ program
   .command('setup [env]')
   .description('run setup commands for all envs')
   .option("-s, --setup_mode [mode]", "Which setup mode to use")
-  .action(function(env, options){
-    var mode = options.setup_mode || "normal";
+  .action((env, options) => {
+    const mode = options.setup_mode || "normal";
     env = env || 'all';
     console.log('setup for %s env(s) with %s mode', env, mode);
   });
@@ -437,9 +438,10 @@ program
   .alias('ex')
   .description('execute the given remote cmd')
   .option("-e, --exec_mode <mode>", "Which exec mode to use")
-  .action(function(cmd, options){
+  .action((cmd, options) => {
     console.log('exec "%s" using %s mode', cmd, options.exec_mode);
-  }).on('--help', function() {
+  })
+  .on('--help', () => {
     console.log('');
     console.log('Examples:');
     console.log('');
@@ -449,7 +451,7 @@ program
 
 program
   .command('*')
-  .action(function(env){
+  .action((env) => {
     console.log('deploying "%s"', env);
   });
 
