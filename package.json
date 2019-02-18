@@ -16,7 +16,7 @@
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production babel src --out-dir dist --extensions \".ts\" --source-maps inline",
-    "docs": "typedoc --out docs src",
+    "docs": "typedoc --out docs src --ignoreCompilerErrors",
     "lint": "eslint .",
     "test": "yarn tsc && node test/run.js && yarn build && yarn doc",
     "ts": "tsc"
@@ -45,7 +45,6 @@
     "typedoc": "^0.14.2",
     "typescript": "^3.3.3"
   },
-  "typings": "typings/index.d.ts",
   "eslintConfig": {
     "extends": "bliss"
   },
@@ -69,5 +68,8 @@
     "plugins": [
       "@babel/plugin-proposal-class-properties"
     ]
+  },
+  "renovate": {
+    "extends": ["bliss"]
   }
 }
