@@ -16,7 +16,6 @@ import fs from 'fs';
  */
 
 class Option {
-
   flags: string;
 
   required: boolean;
@@ -82,7 +81,6 @@ class Option {
  */
 
 class Command extends EventEmitter {
-
   public commands: Array<Command> = [];
 
   public options: Array<Option> = [];
@@ -193,7 +191,11 @@ class Command extends EventEmitter {
    * @param {String} [desc] for git-style sub-commands
    * @return {Command} the new command
    */
-  public command(name: string, desc: string, opts: { isDefault: boolean, noHelp: boolean }): Command {
+  public command(
+    name: string,
+    desc: string,
+    opts: { isDefault: boolean; noHelp: boolean }
+  ): Command {
     if (typeof desc === 'object' && desc !== null) {
       opts = desc;
       desc = null;
@@ -461,7 +463,11 @@ class Command extends EventEmitter {
    *
    * @param {Object} completion rules
    */
-  public complete(rules: { options: {}, arguments: Array<string>, args: Array<string> }) {
+  public complete(rules: {
+    options: {};
+    arguments: Array<string>;
+    args: Array<string>;
+  }) {
     // merge options
     // this should ensure this._completionRules are always in shape
     if (rules.options) {
@@ -915,7 +921,8 @@ class Command extends EventEmitter {
       }
       if (
         this.commands.length === 0 &&
-        this._args.filter(({ required }: { required: boolea }) => required).length === 0
+        this._args.filter(({ required }: { required: boolea }) => required)
+          .length === 0
       ) {
         this.emit('command:*');
       }
@@ -945,7 +952,9 @@ class Command extends EventEmitter {
    * @param {Array} argv
    * @return {Array}
    */
-  parseOptions(argv: Array<string>): { args: Array<string>, unknown: Array<string> } {
+  parseOptions(
+    argv: Array<string>
+  ): { args: Array<string>; unknown: Array<string> } {
     const args = [];
     const len = argv.length;
     let literal;
@@ -1215,7 +1224,11 @@ class Command extends EventEmitter {
     options.push({
       flags: '-h, --help'
     });
-    return options.reduce((max: number, { flags }: { flags: string }) => Math.max(max, flags.length), 0);
+    return options.reduce(
+      (max: number, { flags }: { flags: string }) =>
+        Math.max(max, flags.length),
+      0
+    );
   }
 
   /**
@@ -1224,7 +1237,10 @@ class Command extends EventEmitter {
    * @return {Number}
    */
   private largestArgLength(): number {
-    return this._args.reduce((max: number, { name }: { name: string} ) => Math.max(max, name.length), 0);
+    return this._args.reduce(
+      (max: number, { name }: { name: string }) => Math.max(max, name.length),
+      0
+    );
   }
 
   /**
@@ -1369,7 +1385,9 @@ class Command extends EventEmitter {
 function camelcase(flag: string): string {
   return flag
     .split('-')
-    .reduce((str: string, word: string) => str + word[0].toUpperCase() + word.slice(1));
+    .reduce(
+      (str: string, word: string) => str + word[0].toUpperCase() + word.slice(1)
+    );
 }
 
 /**
@@ -1405,7 +1423,15 @@ function outputHelpIfNecessary(cmd: Command, options: Array<string> = []) {
  * @param {Object} arg
  * @return {String}
  */
-function humanReadableArgName({ name, variadic, required }: { name: string, variadic: boolean, required: boolean }): string {
+function humanReadableArgName({
+  name,
+  variadic,
+  required
+}: {
+  name: string;
+  variadic: boolean;
+  required: boolean;
+}): string {
   const nameOutput = name + (variadic === true ? '...' : '');
 
   return required ? `<${nameOutput}>` : `[${nameOutput}]`;
