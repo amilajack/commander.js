@@ -3,9 +3,15 @@
  */
 
 import { EventEmitter } from 'events';
-import { spawn } from 'child_process';
+import { spawn, ChildProcess } from 'child_process';
 import path from 'path';
 import fs from 'fs';
+
+interface AutocompleteEvent {
+  fragment: number,
+  line: string,
+  reply: (commands: Array<string>) => void
+}
 
 /**
  * Initialize a new `Option` with the given `flags` and `description`.
@@ -39,9 +45,9 @@ class Option {
     this.bool = !flags.includes('-no-');
     const parsedFlags = flags.split(/[ ,|]+/);
     if (parsedFlags.length > 1 && !/^[[<]/.test(parsedFlags[1])) {
-      this.short = parsedFlags.shift();
+      this.short = parsedFlags.shift() || '';
     }
-    this.long = parsedFlags.shift();
+    this.long = parsedFlags.shift() || '';
     this.description = description || '';
   }
 
@@ -63,7 +69,7 @@ class Option {
   /**
    * Check if `arg` matches the short or long flag.
    */
-  private is(arg: string): boolean {
+  is(arg: string): boolean {
     return this.short === arg || this.long === arg;
   }
 
@@ -73,6 +79,13 @@ class Option {
    */
   public arity(): number {
     return this.required || this.optional ? 1 : 0;
+  }
+}
+
+interface CompletionRules {
+  args: Array<string>,
+  options: {
+    [x: string]: string
   }
 }
 
@@ -96,7 +109,7 @@ class Command extends EventEmitter {
   /**
    * The running node process from running a subcommand executable
    */
-  public runningCommand: () => void;
+  public runningCommand: ChildProcess;
 
   public rawArgs: Array<string>;
 
@@ -110,7 +123,7 @@ class Command extends EventEmitter {
 
   private _allowUnknownOption: boolean = false;
 
-  private _args: Array<string> = [];
+  private _args: Array<{ required: boolean, name: string, variadic: boolean }> = [];
 
   private _version: string;
 
@@ -118,13 +131,13 @@ class Command extends EventEmitter {
 
   private _usage: string;
 
-  private _name: string;
+  private _name: string | undefined;
 
   private _versionOptionName: string;
 
-  private _completionRules = {
+  private _completionRules: CompletionRules = {
     options: {},
-    args: {}
+    args: []
   };
 
   constructor(name: string = '') {
@@ -145,7 +158,7 @@ class Command extends EventEmitter {
    * the rest of __ARGV__ remaining.
    *
    * Examples:
-   *
+   * ```ts
    *      program
    *        .version('0.0.1')
    *        .option('-C, --chdir <path>', 'change the working directory')
@@ -186,6 +199,7 @@ class Command extends EventEmitter {
    *        });
    *
    *      program.parse(process.argv);
+   * ```
    *
    * @param {String} name
    * @param {String} [desc] for git-style sub-commands
@@ -193,8 +207,8 @@ class Command extends EventEmitter {
    */
   public command(
     name: string,
-    desc: string,
-    opts: { isDefault: boolean; noHelp: boolean }
+    desc?: string,
+    opts: { isDefault: boolean; noHelp: boolean } = { isDefault: false, noHelp: true }
   ): Command {
     if (typeof desc === 'object' && desc !== null) {
       opts = desc;
@@ -241,7 +255,6 @@ class Command extends EventEmitter {
    */
   public parseExpectedArgs(args: Array<string>): Command {
     if (!args.length) return;
-    const self = this;
     args.forEach(arg => {
       const argDetails = {
         required: false,
@@ -264,7 +277,7 @@ class Command extends EventEmitter {
         argDetails.name = argDetails.name.slice(0, -3);
       }
       if (argDetails.name) {
-        self._args.push(argDetails);
+        this._args.push(argDetails);
       }
     });
     return this;
@@ -286,29 +299,28 @@ class Command extends EventEmitter {
    * @return {Command} for chaining
    */
   action(fn: Function): Command {
-    const self = this;
     const listener = (args = [], unknown = []) => {
-      const parsed = self.parseOptions(unknown);
+      const parsed = this.parseOptions(unknown);
 
       // Output help if necessary
-      outputHelpIfNecessary(self, parsed.unknown);
+      outputHelpIfNecessary(this, parsed.unknown);
 
       // If there are still any unknown options, then we simply
       // die, unless someone asked for help, in which case we give it
       // to them, and then we die.
       if (parsed.unknown.length > 0) {
-        self.unknownOption(parsed.unknown[0]);
+        this.unknownOption(parsed.unknown[0]);
       }
 
       // Leftover arguments need to be pushed back. Fixes issue #56
       if (parsed.args.length) args = parsed.args.concat(args);
 
-      self._args.forEach((arg, i) => {
-        if (arg.required && args[i] == null) {
-          self.missingArgument(arg.name);
+      this._args.forEach((arg, i) => {
+        if (arg.required && args[i] === null) {
+          this.missingArgument(arg.name);
         } else if (arg.variadic) {
-          if (i !== self._args.length - 1) {
-            self.variadicArgNotLast(arg.name);
+          if (i !== this._args.length - 1) {
+            this.variadicArgNotLast(arg.name);
           }
 
           args[i] = args.splice(i);
@@ -318,13 +330,13 @@ class Command extends EventEmitter {
       // Always append ourselves to the end of the arguments,
       // to make sure we match the number of arguments the user
       // expects
-      if (self._args.length) {
-        args[self._args.length] = self;
+      if (this._args.length) {
+        args[this._args.length] = this;
       } else {
-        args.push(self);
+        args.push(this);
       }
 
-      fn.apply(self, args);
+      fn.apply(this, args);
     };
     const parent = this.parent || this;
     const name = parent === this ? '*' : this._name;
@@ -383,10 +395,9 @@ class Command extends EventEmitter {
   option(
     flags: string,
     description: string,
-    fn: Function,
+    fn: Function | RegExp,
     defaultValue: any
   ): Command {
-    const self = this;
     const option = new Option(flags, description);
     const oname = option.name();
     const name = option.attributeName();
@@ -411,7 +422,7 @@ class Command extends EventEmitter {
       if (!option.bool) defaultValue = true;
       // preassign only if we have a default
       if (defaultValue !== undefined) {
-        self[name] = defaultValue;
+        this[name] = defaultValue;
         option.defaultValue = defaultValue;
       }
     }
@@ -424,23 +435,23 @@ class Command extends EventEmitter {
     this.on(`option:${oname}`, val => {
       // coercion
       if (val !== null && fn) {
-        val = fn(val, self[name] === undefined ? defaultValue : self[name]);
+        val = fn(val, this[name] === undefined ? defaultValue : this[name]);
       }
 
       // unassigned or bool
       if (
-        typeof self[name] === 'boolean' ||
-        typeof self[name] === 'undefined'
+        typeof this[name] === 'boolean' ||
+        typeof this[name] === 'undefined'
       ) {
         // if no value, bool true, and we have a default, then use it!
-        if (val == null) {
-          self[name] = option.bool ? defaultValue || true : false;
+        if (val === null) {
+          this[name] = option.bool ? defaultValue || true : false;
         } else {
-          self[name] = val;
+          this[name] = val;
         }
       } else if (val !== null) {
         // reassign
-        self[name] = val;
+        this[name] = val;
       }
     });
 
@@ -490,7 +501,7 @@ class Command extends EventEmitter {
    * @return {Boolean}
    */
   private hasCompletionRules(): boolean {
-    function isEmptyRule({ options, args }) {
+    function isEmptyRule({ options, args }: { options: Object, args: Object }) {
       return (
         Object.keys(options).length === 0 && Object.keys(args).length === 0
       );
@@ -522,12 +533,10 @@ class Command extends EventEmitter {
       // lazy require
       const omelette = require('omelette');
       const executableName = path.basename(argv[1], '.js');
-      const self = this;
-
       const completion = omelette(executableName);
 
-      completion.on('complete', (f: Function, event: Event) => {
-        self.autocompleteHandleEvent(event);
+      completion.on('complete', (f: Function, event: AutocompleteEvent) => {
+        this.autocompleteHandleEvent(event);
       });
 
       // omelette will call process.exit(0)
@@ -542,7 +551,7 @@ class Command extends EventEmitter {
    *
    * @param {Object} omelette event which contains fragment, line, reply info
    */
-  private autocompleteHandleEvent(event: Event) {
+  private autocompleteHandleEvent(event: AutocompleteEvent) {
     if (this.commands.length > 0) {
       // sub command style
       if (event.fragment === 1) {
@@ -640,7 +649,7 @@ class Command extends EventEmitter {
    *
    * @return {Object} normalized rules
    */
-  private autocompleteNormalizeRules(): { options: {} } {
+  private autocompleteNormalizeRules(): { options: {}, args: Array<string> } {
     // supplement with important information including
     // option arity and sibling
     const rawRules = this._completionRules;
@@ -686,7 +695,7 @@ class Command extends EventEmitter {
    * @param {Array} argv
    * @return {Command} for chaining
    */
-  public parse(argv: Array<string>): Command {
+  public parse(argv: Array<string>): Command | void {
     // trigger autocomplete first if some completion rules have been defined
     if (this.hasCompletionRules()) {
       this.autocomplete(argv);
@@ -802,7 +811,7 @@ class Command extends EventEmitter {
 
     args = args.slice(1);
 
-    let proc;
+    let proc: ChildProcess;
     if (process.platform !== 'win32') {
       if (isExplicitJS) {
         args.unshift(bin);
@@ -811,10 +820,9 @@ class Command extends EventEmitter {
 
         proc = spawn(process.argv[0], args, {
           stdio: 'inherit',
-          customFds: [0, 1, 2]
         });
       } else {
-        proc = spawn(bin, args, { stdio: 'inherit', customFds: [0, 1, 2] });
+        proc = spawn(bin, args, { stdio: 'inherit' });
       }
     } else {
       args.unshift(bin);
@@ -921,7 +929,7 @@ class Command extends EventEmitter {
       }
       if (
         this.commands.length === 0 &&
-        this._args.filter(({ required }: { required: boolea }) => required)
+        this._args.filter(({ required }) => required)
           .length === 0
       ) {
         this.emit('command:*');
@@ -937,7 +945,7 @@ class Command extends EventEmitter {
    * @param {String} arg
    * @return {Option}
    */
-  private optionFor(arg: String): Option {
+  private optionFor(arg: string): Option | void {
     for (let i = 0, len = this.options.length; i < len; ++i) {
       if (this.options[i].is(arg)) {
         return this.options[i];
@@ -986,12 +994,12 @@ class Command extends EventEmitter {
         // requires arg
         if (option.required) {
           arg = argv[++i];
-          if (arg == null) return this.optionMissingArgument(option);
+          if (arg === null) return this.optionMissingArgument(option);
           this.emit(`option:${option.name()}`, arg);
           // optional arg
         } else if (option.optional) {
           arg = argv[i + 1];
-          if (arg == null || (arg[0] === '-' && arg !== '-')) {
+          if (arg === null || (arg[0] === '-' && arg !== '-')) {
             arg = null;
           } else {
             ++i;
@@ -1056,7 +1064,7 @@ class Command extends EventEmitter {
    * @param {String} option
    * @param {String} flag
    */
-  optionMissingArgument({ flags }: Option, flag: string) {
+  optionMissingArgument({ flags }: Option, flag?: string) {
     if (flag) {
       console.error(
         'error: option `%s` argument missing, got `%s`',
@@ -1100,8 +1108,8 @@ class Command extends EventEmitter {
    * @param {String} [flags]
    * @return {Command} for chaining
    */
-  version(str: string, flags: string): Command {
-    if (arguments.length === 0) return this._version;
+  version(str: string, flags?: string): Command | string {
+    if (!str) return this._version;
     this._version = str;
     flags = flags || '-V, --version';
     const versionOption = new Option(flags, 'output the version number');
@@ -1134,18 +1142,21 @@ class Command extends EventEmitter {
    * @param {String} alias
    * @return {String|Command}
    */
-  public alias(alias: string): string | Command {
-    let command = this;
+  public alias(alias?: string): string | Command {
+    let command: Command = this;
     if (this.commands.length !== 0) {
       command = this.commands[this.commands.length - 1];
     }
 
     if (arguments.length === 0) return command._alias;
 
-    if (alias === command._name)
+    if (alias === command._name) {
       throw new Error("Command alias can't be the same as its name");
+    }
+    if (alias) {
+      command._alias = alias;
+    }
 
-    command._alias = alias;
     return this;
   }
 
@@ -1155,7 +1166,7 @@ class Command extends EventEmitter {
    * @param {String} str
    * @return {String|Command}
    */
-  usage(str: string): string | Command {
+  usage(str?: string): string | Command {
     const args = this._args.map(arg => humanReadableArgName(arg));
 
     const usage = `[options]${this.commands.length ? ' [command]' : ''}${
@@ -1163,7 +1174,9 @@ class Command extends EventEmitter {
     }`;
 
     if (arguments.length === 0) return this._usage || usage;
-    this._usage = str;
+    if (str) {
+      this._usage = str;
+    }
 
     return this;
   }
@@ -1174,8 +1187,8 @@ class Command extends EventEmitter {
    * @param {String} str
    * @return {String|Command}
    */
-  name(str: string): string | Command {
-    if (arguments.length === 0) return this._name;
+  name(str?: string): undefined | string | Command {
+    if (!str) return this._name;
     this._name = str;
     return this;
   }
@@ -1185,7 +1198,7 @@ class Command extends EventEmitter {
    *
    * @return {Array}
    */
-  prepareCommands(): Array<string> {
+  prepareCommands(): Array<Array<string>> {
     return this.commands
       .filter(({ _noHelp }) => !_noHelp)
       .map(cmd => {
@@ -1359,7 +1372,7 @@ class Command extends EventEmitter {
   /**
    * Output help information for this command
    */
-  public outputHelp(cb: () => void) {
+  public outputHelp(cb?: (a: string) => string) {
     if (!cb) {
       cb = passthru => passthru;
     }
@@ -1370,7 +1383,7 @@ class Command extends EventEmitter {
   /**
    * Output help information and exit.
    */
-  public help(cb: () => void) {
+  public help(cb?: (a: string) => string) {
     this.outputHelp(cb);
     process.exit();
   }
@@ -1447,7 +1460,7 @@ function humanReadableArgName({
 function autocompleteActiveOption(
   optionRules: Object,
   typedArgs: Array<string>
-): Object {
+): boolean | { reply: Object } {
   if (typedArgs.length === 0) {
     return false;
   }

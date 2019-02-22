@@ -7,6 +7,8 @@ const { extname, join } = require('path');
 process.env.NODE_ENV = 'test';
 
 process.stdout.write('\n');
+
+let hasFailingTest = false;
 readdirSync(__dirname).forEach(file => {
   if (!file.startsWith('test.') || extname(file) !== '.js') return;
   process.stdout.write(`\x1b[90m   ${file}\x1b[0m `);
@@ -16,6 +18,10 @@ readdirSync(__dirname).forEach(file => {
   } else {
     process.stdout.write('\x1b[31m✖\x1b[0m\n');
     console.error(result.stderr.toString('utf8'));
-    process.exit(result.status);
+    hasFailingTest = true;
   }
 });
+
+if (hasFailingTest) {
+  process.exit(1);
+}

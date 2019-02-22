@@ -3,7 +3,7 @@
  */
 
 const should = require('should');
-const program = require('../');
+const { default: program } = require('../dist/index.js');
 
 program
   .version('0.0.1')

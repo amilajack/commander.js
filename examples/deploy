@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-const program = require('../');
+const { default: program } = require('../dist/index.js');
 
 program
   .version('0.0.1')
@@ -16,9 +16,8 @@ program
   .command('setup [env]')
   .description('run setup commands for all envs')
   .option('-s, --setup_mode [mode]', 'Which setup mode to use')
-  .action(function(env, options) {
+  .action(function(env = 'all', options) {
     const mode = options.setup_mode || 'normal';
-    env = env || 'all';
     console.log('setup for %s env(s) with %s mode', env, mode);
   });
 

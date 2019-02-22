@@ -3,7 +3,7 @@
  */
 const sinon = require('sinon').sandbox.create();
 const should = require('should');
-const program = require('../');
+const { default: program } = require('../dist/index.js');
 
 const stubError = sinon.stub(console, 'error');
 const stubExit = sinon.stub(process, 'exit');

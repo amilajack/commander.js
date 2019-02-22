@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
-const program = require('../');
+const { default: program } = require('../dist/index.js');
+
+let cmdValue;
+let envValue;
 
 program
   .version('0.0.1')

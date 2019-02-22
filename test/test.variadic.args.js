@@ -4,7 +4,7 @@
 
 const should = require('should');
 const util = require('util');
-const program = require('../');
+const { default: program } = require('../dist/index.js');
 
 const programArgs = [
   'node',
@@ -38,7 +38,7 @@ program.args[1].should.eql(['arg1', 'arg2', 'arg3']);
 program
   .version('0.0.1')
   .command('mycommand <variadicArg...> [optionalArg]')
-  .action(function(arg0, arg1) {});
+  .action(function() {});
 
 // Make sure we still catch errors with required values for options
 const consoleErrors = [];

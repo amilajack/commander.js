@@ -1,6 +1,6 @@
 const sinon = require('sinon');
 const should = require('should');
-const program = require('../');
+const { default: program } = require('../dist/index.js');
 
 sinon.stub(process, 'exit');
 sinon.stub(process.stdout, 'write');

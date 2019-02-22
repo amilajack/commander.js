@@ -1,6 +1,6 @@
 const sinon = require('sinon').sandbox.create();
 const should = require('should');
-const program = require('../');
+const { default: program } = require('../dist/index.js');
 
 program.command('somecommand');
 program.command('anothercommand [options]');

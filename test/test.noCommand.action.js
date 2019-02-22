@@ -1,5 +1,5 @@
 const should = require('should');
-const program = require('../');
+const { default: program } = require('../dist/index.js');
 
 let val = false;
 program.option('-C, --no-color', 'turn off color output').action(function() {

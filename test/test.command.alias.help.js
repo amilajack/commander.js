@@ -1,5 +1,5 @@
 const should = require('should');
-const program = require('../');
+const { default: program } = require('../dist/index.js');
 
 program
   .command('info [thing]')
