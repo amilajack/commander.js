@@ -16,39 +16,62 @@
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production babel src --out-dir dist --extensions \".ts\" --source-maps inline",
+    "types": "yarn ts --declaration",
     "docs": "typedoc --out docs src --ignoreCompilerErrors",
-    "lint": "eslint .",
-    "spec": "node -r @babel/register test/run.js",
+    "lint": "eslint . --ext .ts",
+    "spec": "node -r @babel/register test/run.js && jest",
     "test": "yarn tsc && node test/run.js && yarn build && yarn doc && yarn lint",
     "ts": "tsc"
   },
-  "main": "./lib",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
   "files": [
-    "index.js",
-    "typings/index.d.ts"
+    "dist"
   ],
   "dependencies": {
     "omelette": "^0.4.12"
   },
   "devDependencies": {
+    "@amilajack/joker": "^0.0.1-0",
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.3.3",
     "@babel/plugin-proposal-class-properties": "^7.3.3",
     "@babel/preset-env": "^7.3.1",
     "@babel/preset-typescript": "^7.3.3",
     "@babel/register": "^7.0.0",
-    "@types/node": "^11.9.4",
+    "@types/node": "^11.9.5",
+    "@typescript-eslint/eslint-plugin": "^1.4.0",
+    "@typescript-eslint/parser": "^1.4.0",
     "cross-env": "^5.2.0",
-    "eslint": "^5.14.0",
+    "eslint": "^5.14.1",
     "eslint-config-bliss": "^3.3.0",
+    "eslint-import-resolver-typescript": "^1.1.1",
+    "jest": "^24.1.0",
     "jest-cli": "^24.1.0",
     "should": "^13.2.3",
-    "sinon": "^7.2.3",
+    "sinon": "^7.2.4",
     "typedoc": "^0.14.2",
-    "typescript": "^3.3.3"
+    "typescript": "^3.3.3333"
   },
   "eslintConfig": {
-    "extends": "bliss"
+    "extends": [
+      "bliss",
+      "plugin:@typescript-eslint/recommended",
+      "prettier",
+      "prettier/@typescript-eslint"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "rules": {
+      "no-useless-constructor": "off"
+    },
+    "settings": {
+      "import/resolver": {
+        "typescript": {}
+      }
+    }
   },
   "babel": {
     "presets": [
@@ -75,5 +98,8 @@
     "extends": [
       "bliss"
     ]
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }

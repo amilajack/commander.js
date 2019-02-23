@@ -24,7 +24,7 @@
  * Module dependencies.
  */
 
-var program = require('commander');
+const program = require('commander');
 
 program
   .version('0.0.1')
@@ -110,7 +110,7 @@ console.log(' drink: %j', program.drink);
  * Module dependencies.
  */
 
-var program = require('commander');
+const program = require('commander');
 
 program
   .version('0.0.1')
@@ -133,7 +133,7 @@ program.parse(process.argv);
 ```js
 #!/usr/bin/env node
 
-var program = require('../');
+const program = require('../');
 
 program
   .version('0.0.1')
@@ -158,7 +158,7 @@ console.log('environment:', envValue || "no environment given");
 
 ```js
 // file: ./examples/pm
-var program = require('..');
+const program = require('..');
 
 program
   .version('0.0.1')
@@ -246,7 +246,7 @@ Options:
  * Module dependencies.
  */
 
-var program = require('commander');
+const program = require('commander');
 
 program
   .version('0.0.1')
@@ -293,8 +293,8 @@ Examples:
 如果你想显示默认的帮助（例如，如果没有提供命令），你可以使用类似的东西：
 
 ```js
-var program = require('commander');
-var colors = require('colors');
+const program = require('commander');
+const colors = require('colors');
 
 program
   .version('0.0.1')
@@ -318,7 +318,7 @@ function make_red(txt) {
 ## 例子
 
 ```js
-var program = require('commander');
+const program = require('commander');
 
 program
   .version('0.0.1')
@@ -331,7 +331,7 @@ program
   .description('run setup commands for all envs')
   .option("-s, --setup_mode [mode]", "Which setup mode to use")
   .action(function(env, options){
-    var mode = options.setup_mode || "normal";
+    const mode = options.setup_mode || "normal";
     env = env || 'all';
     console.log('setup for %s env(s) with %s mode', env, mode);
   });

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var program = require('../../');
+import program from '../../src';
 
 program
   .version('0.0.1')

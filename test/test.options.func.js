@@ -3,7 +3,7 @@ const { default: program } = require('../dist/index.js');
 
 program
   .version('0.0.1')
-  .description('sdfdsfsfsdfdsf')
+  .description('some description')
   .option('-f, --foo', 'add some foo')
   .option('-b, --bar', 'add some bar')
   .option('-M, --no-magic', 'disable magic')
