@@ -971,7 +971,7 @@ export class Command extends EventEmitter {
    * @param {Array} argv
    * @return {Array}
    */
-  parseOptions(argv: string[]): { args: string[]; unknown: string[] } {
+  private parseOptions(argv: string[]): { args: string[]; unknown: string[] } {
     const args = [];
     const len = argv.length;
     let literal;
@@ -1046,7 +1046,7 @@ export class Command extends EventEmitter {
    *
    * @return {Object}
    */
-  opts(): Record<string, any> {
+  public opts(): Record<string, any> {
     const result = {};
     const len = this.options.length;
 
@@ -1062,7 +1062,7 @@ export class Command extends EventEmitter {
    *
    * @param {String} name
    */
-  missingArgument(name: string) {
+  private missingArgument(name: string) {
     console.error('error: missing required argument `%s`', name);
     process.exit(1);
   }
@@ -1073,7 +1073,7 @@ export class Command extends EventEmitter {
    * @param {String} option
    * @param {String} flag
    */
-  optionMissingArgument({ flags }: Option, flag?: string) {
+  private optionMissingArgument({ flags }: Option, flag?: string) {
     if (flag) {
       console.error(
         'error: option `%s` argument missing, got `%s`',
@@ -1091,7 +1091,7 @@ export class Command extends EventEmitter {
    *
    * @param {String} flag
    */
-  unknownOption(flag: string) {
+  private unknownOption(flag: string) {
     if (this._allowUnknownOption) return;
     console.error('error: unknown option `%s`', flag);
     process.exit(1);
@@ -1102,7 +1102,7 @@ export class Command extends EventEmitter {
    *
    * @param {String} name
    */
-  variadicArgNotLast(name: string) {
+  private variadicArgNotLast(name: string) {
     console.error('error: variadic arguments must be last `%s`', name);
     process.exit(1);
   }
@@ -1117,7 +1117,7 @@ export class Command extends EventEmitter {
    * @param {String} [flags]
    * @return {Command} for chaining
    */
-  version(str: string, flags?: string): Command {
+  public version(str: string, flags?: string): Command {
     if (!str) return this._version;
     this._version = str;
     flags = flags || '-V, --version';
@@ -1138,7 +1138,7 @@ export class Command extends EventEmitter {
    * @param {Object} argsDescription
    * @return {String|Command}
    */
-  description(
+  public description(
     str: string,
     argsDescription?: Record<string, any>
   ): string | Command {
