@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const program = require('..');
+const { default: program } = require('..');
 
 program.option('-f, --force', 'force installation').parse(process.argv);
 

@@ -13,6 +13,11 @@ program.parse('node test -m'.split(' '));
 
 stubError.callCount.should.equal(1);
 
+function resetStubStatus() {
+  stubError.reset();
+  stubExit.reset();
+}
+
 // test subcommand
 resetStubStatus();
 program.command('sub').action(function() {});
@@ -39,8 +44,3 @@ program.parse('node test sub2 -m'.split(' '));
 
 stubError.callCount.should.equal(1);
 stubExit.calledOnce.should.be.false();
-
-function resetStubStatus() {
-  stubError.reset();
-  stubExit.reset();
-}

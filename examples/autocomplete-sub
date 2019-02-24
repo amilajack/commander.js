@@ -8,7 +8,7 @@
  * eval "$(autocomplete-sub --completion)"
  */
 
-const program = require('..');
+const { default: program } = require('..');
 
 program
   .command('sub1 <arg1> <arg2>')

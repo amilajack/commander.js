@@ -8,21 +8,21 @@ import path from 'path';
 import fs from 'fs';
 
 interface AutocompleteEvent {
-  fragment: number,
-  line: string,
-  reply: (commands: string[]) => void
+  fragment: number;
+  line: string;
+  reply: (commands: string[]) => void;
 }
 
 /**
- * Initialize a new `Option` with the given `flags` and `description`.
+ * Initialize a new [[Option]] with the given `flags` and `description`.
  *
  * @param {String} flags
  * @param {String} description
  * @public
  */
 
-class Option {
-  flags: string;
+export class Option {
+  private flags: string;
 
   required: boolean;
 
@@ -30,15 +30,15 @@ class Option {
 
   bool: boolean;
 
-  short: string;
+  private short: string;
 
-  long: string;
+  private long: string;
 
-  description: string;
+  private description: string;
 
-  defaultValue: string;
+  private defaultValue: string;
 
-  constructor(flags: string, description: string) {
+  public constructor(flags: string, description: string) {
     this.flags = flags;
     this.required = flags.includes('<');
     this.optional = flags.includes('[');
@@ -54,7 +54,7 @@ class Option {
   /**
    * Return option name.
    */
-  name(): string {
+  private name(): string {
     return this.long.replace('--', '').replace('no-', '');
   }
 
@@ -83,18 +83,18 @@ class Option {
 }
 
 interface CompletionRules {
-  args: string[],
+  args: string[];
   options: {
-    [x: string]: string
-  }
+    [x: string]: string;
+  };
 }
 
 /**
- * Initialize a new `Command`.
+ * Initialize a new [[Command]].
  * @public
  */
 
-class Command extends EventEmitter {
+export class Command extends EventEmitter {
   public commands: Command[] = [];
 
   public options: Option[] = [];
@@ -124,7 +124,7 @@ class Command extends EventEmitter {
 
   private _allowUnknownOption: boolean = false;
 
-  private _args: { required: boolean, name: string, variadic: boolean }[] = [];
+  private _args: { required: boolean; name: string; variadic: boolean }[] = [];
 
   private _version: string;
 
@@ -160,46 +160,46 @@ class Command extends EventEmitter {
    *
    * Examples:
    * ```ts
-   *      program
-   *        .version('0.0.1')
-   *        .option('-C, --chdir <path>', 'change the working directory')
-   *        .option('-c, --config <path>', 'set config path. defaults to ./deploy.conf')
-   *        .option('-T, --no-tests', 'ignore test hook')
+   * program
+   *   .version('0.0.1')
+   *   .option('-C, --chdir <path>', 'change the working directory')
+   *   .option('-c, --config <path>', 'set config path. defaults to ./deploy.conf')
+   *   .option('-T, --no-tests', 'ignore test hook')
    *
-   *      program
-   *        .command('setup')
-   *        .description('run remote setup commands')
-   *        .action(() => {
-   *          console.log('setup');
-   *        });
+   * program
+   *   .command('setup')
+   *   .description('run remote setup commands')
+   *   .action(() => {
+   *     console.log('setup');
+   *   });
    *
-   *      program
-   *        .command('exec <cmd>')
-   *        .description('run the given remote command')
-   *        .action((cmd) => {
-   *          console.log('exec "%s"', cmd);
-   *        });
+   * program
+   *   .command('exec <cmd>')
+   *   .description('run the given remote command')
+   *   .action((cmd) => {
+   *     console.log('exec "%s"', cmd);
+   *   });
    *
-   *      program
-   *        .command('teardown <dir> [otherDirs...]')
-   *        .description('run teardown commands')
-   *        .action((dir, otherDirs) => {
-   *          console.log('dir "%s"', dir);
-   *          if (otherDirs) {
-   *            otherDirs.forEach((oDir) => {
-   *              console.log('dir "%s"', oDir);
-   *            });
-   *          }
-   *        });
+   * program
+   *   .command('teardown <dir> [otherDirs...]')
+   *   .description('run teardown commands')
+   *   .action((dir, otherDirs) => {
+   *     console.log('dir "%s"', dir);
+   *     if (otherDirs) {
+   *       otherDirs.forEach((oDir) => {
+   *         console.log('dir "%s"', oDir);
+   *       });
+   *     }
+   *   });
    *
-   *      program
-   *        .command('*')
-   *        .description('deploy the given env')
-   *        .action((env) => {
-   *          console.log('deploying "%s"', env);
-   *        });
+   * program
+   *   .command('*')
+   *   .description('deploy the given env')
+   *   .action((env) => {
+   *     console.log('deploying "%s"', env);
+   *   });
    *
-   *      program.parse(process.argv);
+   * program.parse(process.argv);
    * ```
    *
    * @param {String} name
@@ -209,7 +209,10 @@ class Command extends EventEmitter {
   public command(
     name: string,
     desc?: string,
-    opts: { isDefault: boolean; noHelp: boolean } = { isDefault: false, noHelp: true }
+    opts: { isDefault: boolean; noHelp: boolean } = {
+      isDefault: false,
+      noHelp: true
+    }
   ): Command {
     if (typeof desc === 'object' && desc !== null) {
       opts = desc;
@@ -237,7 +240,7 @@ class Command extends EventEmitter {
   /**
    * Define argument syntax for the top-level command.
    */
-  public arguments(desc: string) {
+  public arguments(desc: string): Command {
     return this.parseExpectedArgs(desc.split(/ +/));
   }
 
@@ -245,7 +248,7 @@ class Command extends EventEmitter {
    * Add an implicit `help [cmd]` subcommand
    * which invokes `--help` for the given command.
    */
-  private addImplicitHelpCommand() {
+  private addImplicitHelpCommand(): void {
     this.command('help [cmd]', 'display help for [cmd]');
   }
 
@@ -465,7 +468,7 @@ class Command extends EventEmitter {
    * @param {Boolean} arg if `true` or omitted, no error will be thrown
    * for unknown options.
    */
-  public allowUnknownOption(arg: boolean) {
+  public allowUnknownOption(arg: boolean): Command {
     this._allowUnknownOption = arguments.length === 0 || arg;
     return this;
   }
@@ -479,7 +482,7 @@ class Command extends EventEmitter {
     options: {};
     arguments: string[];
     args: string[];
-  }) {
+  }): Command {
     // merge options
     // this should ensure this._completionRules are always in shape
     if (rules.options) {
@@ -502,7 +505,13 @@ class Command extends EventEmitter {
    * @return {Boolean}
    */
   private hasCompletionRules(): boolean {
-    function isEmptyRule({ options, args }: { options: Record<string, any>, args: Record<string, any> }) {
+    function isEmptyRule({
+      options,
+      args
+    }: {
+      options: Record<string, any>;
+      args: Record<string, any>;
+    }) {
       return (
         Object.keys(options).length === 0 && Object.keys(args).length === 0
       );
@@ -520,7 +529,7 @@ class Command extends EventEmitter {
    * Handle autocomplete if command args starts with special options.
    * It will exit current process after successful processing.
    */
-  autocomplete(argv: string[]) {
+  public autocomplete(argv: string[]): Command {
     const RESERVED_STARTING_KEYWORDS = [
       '--completion',
       '--completion-fish',
@@ -552,7 +561,7 @@ class Command extends EventEmitter {
    *
    * @param {Object} omelette event which contains fragment, line, reply info
    */
-  private autocompleteHandleEvent(event: AutocompleteEvent) {
+  private autocompleteHandleEvent(event: AutocompleteEvent): void {
     if (this.commands.length > 0) {
       // sub command style
       if (event.fragment === 1) {
@@ -650,7 +659,7 @@ class Command extends EventEmitter {
    *
    * @return {Object} normalized rules
    */
-  private autocompleteNormalizeRules(): { options: {}, args: string[] } {
+  private autocompleteNormalizeRules(): { options: {}; args: string[] } {
     // supplement with important information including
     // option arity and sibling
     const rawRules = this._completionRules;
@@ -764,11 +773,7 @@ class Command extends EventEmitter {
    * @param {Array} args
    * @param {Array} unknown
    */
-  private executeSubCommand(
-    argv: string[],
-    args: string[],
-    unknown: any[]
-  ) {
+  private executeSubCommand(argv: string[], args: string[], unknown: any[]) {
     args = args.concat(unknown);
 
     if (!args.length) this.help();
@@ -820,7 +825,7 @@ class Command extends EventEmitter {
         args = (process.execArgv || []).concat(args);
 
         proc = spawn(process.argv[0], args, {
-          stdio: 'inherit',
+          stdio: 'inherit'
         });
       } else {
         proc = spawn(bin, args, { stdio: 'inherit' });
@@ -830,7 +835,13 @@ class Command extends EventEmitter {
       proc = spawn(process.execPath, args, { stdio: 'inherit' });
     }
 
-    const signals: NodeJS.Signals[] = ['SIGUSR1', 'SIGUSR2', 'SIGTERM', 'SIGINT', 'SIGHUP'];
+    const signals: NodeJS.Signals[] = [
+      'SIGUSR1',
+      'SIGUSR2',
+      'SIGTERM',
+      'SIGINT',
+      'SIGHUP'
+    ];
     signals.forEach(signal => {
       process.on(signal, () => {
         if (proc.killed === false && proc.exitCode === null) {
@@ -930,8 +941,7 @@ class Command extends EventEmitter {
       }
       if (
         this.commands.length === 0 &&
-        this._args.filter(({ required }) => required)
-          .length === 0
+        this._args.filter(({ required }) => required).length === 0
       ) {
         this.emit('command:*');
       }
@@ -961,9 +971,7 @@ class Command extends EventEmitter {
    * @param {Array} argv
    * @return {Array}
    */
-  parseOptions(
-    argv: string[]
-  ): { args: string[]; unknown: string[] } {
+  parseOptions(argv: string[]): { args: string[]; unknown: string[] } {
     const args = [];
     const len = argv.length;
     let literal;
@@ -1060,7 +1068,7 @@ class Command extends EventEmitter {
   }
 
   /**
-   * `Option` is missing an argument, but received `flag` or nothing.
+   * [[Option]] is missing an argument, but received `flag` or nothing.
    *
    * @param {String} option
    * @param {String} flag
@@ -1130,7 +1138,10 @@ class Command extends EventEmitter {
    * @param {Object} argsDescription
    * @return {String|Command}
    */
-  description(str: string, argsDescription?: Record<string, any>): string | Command {
+  description(
+    str: string,
+    argsDescription?: Record<string, any>
+  ): string | Command {
     if (arguments.length === 0) return this._description;
     this._description = str;
     this.argsDescription = argsDescription;
@@ -1335,7 +1346,7 @@ class Command extends EventEmitter {
     if (this._description) {
       desc = [this._description, ''];
 
-      const argsDescription = this.argsDescription;
+      const { argsDescription } = this;
       if (argsDescription && this._args.length) {
         const width = this.padWidth();
         desc.push('Arguments:');
@@ -1524,15 +1535,3 @@ function autocompleteActiveArg(
  */
 
 export default new Command();
-
-/**
- * Expose `Command`.
- */
-
-export { Command };
-
-/**
- * Expose `Option`.
- */
-
-export { Option };

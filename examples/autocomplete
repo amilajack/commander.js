@@ -10,7 +10,7 @@
  * And then you can try use tab completion after auto-complete command
  */
 
-const program = require('..');
+const { default: program } = require('..');
 
 program
   .arguments('<a> <b>')

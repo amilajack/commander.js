@@ -18,7 +18,8 @@
     "build": "cross-env NODE_ENV=production babel src --out-dir dist --extensions \".ts\" --source-maps inline",
     "types": "yarn ts --declaration",
     "docs": "typedoc --out docs src --ignoreCompilerErrors",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint --ignore-path .gitignore --ignore-pattern '/docs/' --ext .ts --ext .js .",
+    "jest": "jest",
     "spec": "node -r @babel/register test/run.js && jest",
     "test": "yarn tsc && node test/run.js && yarn build && yarn doc && yarn lint",
     "ts": "tsc"
@@ -32,7 +33,7 @@
     "omelette": "^0.4.12"
   },
   "devDependencies": {
-    "@amilajack/joker": "^0.0.1-0",
+    "@amilajack/joker": "^0.0.1-1",
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.3.3",
     "@babel/plugin-proposal-class-properties": "^7.3.3",
@@ -55,22 +56,36 @@
   },
   "eslintConfig": {
     "extends": [
-      "bliss",
       "plugin:@typescript-eslint/recommended",
       "prettier",
       "prettier/@typescript-eslint"
     ],
     "parser": "@typescript-eslint/parser",
     "plugins": [
-      "@typescript-eslint"
+      "@typescript-eslint",
+      "prettier"
     ],
     "rules": {
-      "no-useless-constructor": "off"
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "no-useless-constructor": "off",
+      "prettier/prettier": [
+        "error",
+        {
+          "singleQuote": true
+        }
+      ]
     },
     "settings": {
       "import/resolver": {
         "typescript": {}
       }
+    },
+    "parserOptions": {
+      "sourceType": "module"
+    },
+    "env": {
+      "es6": true,
+      "node": true
     }
   },
   "babel": {
