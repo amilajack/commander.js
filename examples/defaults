@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-const { default: program } = require('../dist/index.js');
+import program from '../src';
 
 function list(val) {
   return val.split(',').map(Number);

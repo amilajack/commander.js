@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { default: program } = require('../dist/index.js');
+import program from '../src';
 
 let cmdValue;
 let envValue;

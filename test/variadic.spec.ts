@@ -1,0 +1,66 @@
+import util from 'util';
+import program from '../src';
+
+describe('variadic', () => {
+  test('args', () => {
+    const programArgs = [
+      'node',
+      'test',
+      'mycommand',
+      'arg0',
+      'arg1',
+      'arg2',
+      'arg3'
+    ];
+    let requiredArg;
+    let variadicArg;
+
+    program
+      .version('0.0.1')
+      .command('mycommand <id> [variadicArg...]')
+      .action((arg0, arg1) => {
+        requiredArg = arg0;
+        variadicArg = arg1;
+      });
+
+    program.parse(programArgs);
+
+    expect(requiredArg).toEqual('arg0');
+    expect(variadicArg).toEqual(['arg1', 'arg2', 'arg3']);
+
+    expect(program.args).toHaveLength(3);
+    expect(program.args[0]).toEqual('arg0');
+    expect(program.args[1]).toEqual(['arg1', 'arg2', 'arg3']);
+
+    program
+      .version('0.0.1')
+      .command('mycommand <variadicArg...> [optionalArg]')
+      .action(() => {});
+
+    // Make sure we still catch errors with required values for options
+    const consoleErrors: string[] = [];
+    const oldProcessExit = process.exit;
+    const oldConsoleError = console.error;
+    let errorMessage;
+
+    process.exit = () => {
+      throw new Error(consoleErrors.join('\n'));
+    };
+    console.error = () => {
+      consoleErrors.push(util.format.apply(util, arguments));
+    };
+
+    try {
+      program.parse(programArgs);
+    } catch (err) {
+      errorMessage = err.message;
+    }
+
+    process.exit = oldProcessExit;
+    console.error = oldConsoleError;
+
+    expect('error: variadic arguments must be last `variadicArg`').toEqual(
+      errorMessage
+    );
+  });
+});

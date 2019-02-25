@@ -399,8 +399,8 @@ export class Command extends EventEmitter {
   option(
     flags: string,
     description: string,
-    fn: Function | RegExp,
-    defaultValue: any
+    fn?: Function | RegExp,
+    defaultValue?: any
   ): Command {
     const option = new Option(flags, description);
     const oname = option.name();
@@ -468,8 +468,8 @@ export class Command extends EventEmitter {
    * @param {Boolean} arg if `true` or omitted, no error will be thrown
    * for unknown options.
    */
-  public allowUnknownOption(arg: boolean): Command {
-    this._allowUnknownOption = arguments.length === 0 || arg;
+  public allowUnknownOption(arg?: boolean): Command {
+    this._allowUnknownOption = arg ? arg : true;
     return this;
   }
 
@@ -1341,7 +1341,7 @@ export class Command extends EventEmitter {
    *
    * @return {String}
    */
-  private helpInformation(): string {
+  public helpInformation(): string {
     let desc: string[] = [];
     if (this._description) {
       desc = [this._description, ''];
