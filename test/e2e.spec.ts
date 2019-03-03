@@ -6,11 +6,11 @@ const pmFixture = require.resolve('./fixtures/pm');
 describe('E2E', () => {
   it('should get version', async () => {
     await new Joker()
-      .base('node ')
-      .run(`${cmdFixture} --version`)
+      .base(`node ${cmdFixture}`)
+      .run('--version')
       .stdout('0.0.1')
       .code(0)
-      .run(`${cmdFixture} foo`)
+      .run('foo')
       .stdout('foo')
       .code(0)
       .end();
@@ -18,11 +18,11 @@ describe('E2E', () => {
 
   it('should do basic stuff', async () => {
     await new Joker()
-      .base('node ')
-      .run(`${pmFixture} --version`)
+      .base(`node ${pmFixture}`)
+      .run('--version')
       .stdout('0.0.1')
       .code(0)
-      .run(`${pmFixture} non-existent-command`)
+      .run('non-existent-command')
       .stdout('default')
       .code(0)
       .end();

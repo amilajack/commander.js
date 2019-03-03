@@ -167,7 +167,7 @@ export class Command extends EventEmitter {
    */
   public runningCommand: ChildProcess;
 
-  public rawArgs: string[];
+  public rawArgs: Args;
 
   private noHelp: boolean;
 
@@ -549,7 +549,9 @@ export class Command extends EventEmitter {
   public complete(rules: {
     options: {};
     arguments: {
-      filename: string[];
+      filename: string[],
+      args: string[],
+      url: string[]
     };
     args: string[];
   }): Command {
@@ -847,7 +849,7 @@ export class Command extends EventEmitter {
    * @param {Array} unknown
    */
   private executeSubCommand(
-    argv: (string | boolean)[],
+    argv: string[],
     args: string[],
     unknown: any[]
   ) {

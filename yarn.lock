@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@amilajack/joker@^0.0.3-1":
-  version "0.0.3-1"
-  resolved "https://registry.yarnpkg.com/@amilajack/joker/-/joker-0.0.3-1.tgz#9572fa05b1dda7e348844c5da5f205203b74d7fb"
-  integrity sha512-DNBSfUhMQYni6Nxfu2P9rYsi2FdfDYeiF/53Hns7lq7SgWBTm7ioELQjFHXGEWRbE4LnsrgAR1P4pX7pGbmKyQ==
+"@amilajack/joker@^0.0.3-3":
+  version "0.0.3-3"
+  resolved "https://registry.yarnpkg.com/@amilajack/joker/-/joker-0.0.3-3.tgz#7208b53d6438e7427e740ec6a265e7b9e6e4b6fc"
+  integrity sha512-ir2CfL5/dDWc+68f21eoKhw+EfnQv6gaS6qYfNucW5+3IwN3GFxVHC8ia10IQ3st70Gl+d1LWjqoq7i2dmg74A==
   dependencies:
     assertion-error "^1.1.0"
     clone "^2.1.2"

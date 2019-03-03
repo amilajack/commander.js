@@ -1,6 +1,7 @@
 import path from 'path';
 import { spawn, exec } from 'child_process';
 import sinonCreator from 'sinon';
+import Joker from '@amilajack/joker';
 import { default as program } from '../src';
 
 process.env.COMMANDER_ENV = 'test';
@@ -59,7 +60,7 @@ describe('command', () => {
     expect(prog.commandHelp()).not.toContain('test|');
   });
 
-  test.skip('command allowUnknownOption', () => {
+  test('command allowUnknownOption', () => {
     const stubError = sinon.stub(console, 'error');
     const stubExit = sinon.stub(process, 'exit');
 
@@ -111,7 +112,7 @@ describe('command', () => {
   test('autocompletion single', () => {
     expect(program().hasCompletionRules()).toBe(false);
 
-    program()
+    let prog = program()
       .arguments('<filename>')
       .option('--verbose', 'verbose')
       .option('-o, --output <file>', 'output')
@@ -132,9 +133,10 @@ describe('command', () => {
         }
       });
 
-    expect(program().hasCompletionRules()).toBe(true);
+    expect(prog.hasCompletionRules()).toBe(true);
 
-    const prog = program().autocompleteNormalizeRules();
+    prog.autocompleteNormalizeRules();
+
     expect(prog).toEqual({
       options: {
         '--verbose': {
@@ -176,7 +178,7 @@ describe('command', () => {
       'file2.c'
     ]);
 
-    expect(program().autocompleteCandidates(['--verbose'])).toEqual([
+    expect(prog.autocompleteCandidates(['--verbose'])).toEqual([
       '-o',
       '--output',
       '--debug-level',
@@ -185,30 +187,30 @@ describe('command', () => {
       'file2.c'
     ]);
 
-    expect(program().autocompleteCandidates(['-o'])).toEqual([
+    expect(prog.autocompleteCandidates(['-o'])).toEqual([
       'file1',
       'file2'
     ]);
 
-    expect(program().autocompleteCandidates(['--output'])).toEqual([
+    expect(prog.autocompleteCandidates(['--output'])).toEqual([
       'file1',
       'file2'
     ]);
 
-    expect(program().autocompleteCandidates(['--debug-level'])).toEqual([
+    expect(prog.autocompleteCandidates(['--debug-level'])).toEqual([
       'info',
       'error'
     ]);
 
-    expect(program().autocompleteCandidates(['-m'])).toEqual(['-m']);
+    expect(prog.autocompleteCandidates(['-m'])).toEqual(['-m']);
 
-    expect(program().autocompleteCandidates(['--verbose', '-m'])).toEqual([
+    expect(prog.autocompleteCandidates(['--verbose', '-m'])).toEqual([
       '--verbose',
       '-m'
     ]);
 
     expect(
-      program().autocompleteCandidates([
+      prog.autocompleteCandidates([
         '--verbose',
         '-o',
         'file1',
@@ -221,7 +223,7 @@ describe('command', () => {
 
     // nothing to complete
     expect(
-      program().autocompleteCandidates([
+      prog.autocompleteCandidates([
         '--verbose',
         '-o',
         'file1',
@@ -235,7 +237,7 @@ describe('command', () => {
 
     // place arguments in different position
     expect(
-      program().autocompleteCandidates([
+      prog.autocompleteCandidates([
         'file1.c',
         '-o',
         'file1',
@@ -249,7 +251,7 @@ describe('command', () => {
     // should handle the case
     // when provide more args than expected
     expect(
-      program().autocompleteCandidates([
+      prog.autocompleteCandidates([
         'file1.c',
         'file2.c',
         '--verbose',
@@ -365,41 +367,22 @@ describe('command', () => {
     ]);
   });
 
-  test.skip('executableSubcommand', () => {
-    var bin = path.join(__dirname, './fixtures/pm');
-    // not exist
-    exec(`${bin} list`, (error, stdout, stderr) => {
-      expect(stderr).toEqual('\n  pm-list(1) does not exist, try --help\n\n');
-      // TODO error info are not the same in between <=v0.8 and later version
-      expect(0).not.toEqual(stderr.length);
-    });
-
-    // success case
-    exec(`${bin} install`, (error, stdout, stderr) => {
-      expect(stdout).toEqual('install\n');
-    });
-
-    // subcommand bin file with explicit extension
-    exec(`${bin} publish`, (error, stdout, stderr) => {
-      expect(stdout).toEqual('publish\n');
-    });
-
-    // spawn EACCES
-    exec(`${bin} search`, (error, stdout, { length }) => {
-      // TODO error info are not the same in between <v0.10 and v0.12
-      expect(0).not.toEqual(length);
-    });
-
-    // when `bin` is a symbol link for mocking global install
-    var bin = path.join(__dirname, './fixtures/pmlink');
-    // success case
-    exec(`${bin} install`, (error, stdout, stderr) => {
-      expect(stdout).toEqual('install\n');
-    });
+  test('executableSubcommand', async () => {
+    const bin = path.join(__dirname, 'fixtures/pm');
+    await new Joker()
+      .base(bin)
+      .run('list')
+      .stdout('')
+      .stderr('\n  pm-list(1) does not exist, try --help\n\n')
+      .run('install')
+      .stdout('install')
+      .run('publish')
+      .stdout('publish')
+      .end();
   });
 
-  test.skip('executable subcommand signals hup', () => {
-    const bin = path.join(__dirname, './fixtures/pm');
+  test('executable subcommand signals hup', (done) => {
+    const bin = path.join(__dirname, 'fixtures/pm');
     const proc = spawn(bin, ['listen'], {});
 
     let output = '';
@@ -414,12 +397,13 @@ describe('command', () => {
       // Set another timeout to give 'prog' time to handle the signal
       setTimeout(() => {
         expect(output).toEqual('SIGHUP\n');
+        done();
       }, 1000);
     }, 2000);
   });
 
-  test.skip('executable subcommand signals int', () => {
-    const bin = path.join(__dirname, './fixtures/pm');
+  test('executable subcommand signals int', (done) => {
+    const bin = path.join(__dirname, 'fixtures/pm');
     const proc = spawn(bin, ['listen'], {});
 
     let output = '';
@@ -434,12 +418,13 @@ describe('command', () => {
       // Set another timeout to give 'prog' time to handle the signal
       setTimeout(() => {
         expect(output).toEqual('SIGINT\n');
+        done()
       }, 1000);
     }, 2000);
   });
 
-  test.skip('term', () => {
-    const bin = path.join(__dirname, './fixtures/pm');
+  test('term', (done) => {
+    const bin = path.join(__dirname, 'fixtures/pm');
     const proc = spawn(bin, ['listen'], {});
 
     let output = '';
@@ -454,12 +439,13 @@ describe('command', () => {
       // Set another timeout to give 'prog' time to handle the signal
       setTimeout(() => {
         expect(output).toEqual('SIGTERM\n');
+        done();
       }, 1000);
     }, 2000);
   });
 
-  test.skip('usr1', () => {
-    const bin = path.join(__dirname, './fixtures/pm');
+  test('usr1', (done) => {
+    const bin = path.join(__dirname, 'fixtures/pm');
     const proc = spawn(bin, ['listen'], {});
 
     let output = '';
@@ -485,12 +471,13 @@ describe('command', () => {
          * only "SIGUSR1", but any other output is also allowed.
          */
         expect(output).toMatch(/(^|\n)SIGUSR1\n/);
+        done();
       }, 1000);
     }, 2000);
   });
 
-  test.skip('usr2', () => {
-    const bin = path.join(__dirname, './fixtures/pm');
+  test('usr2', (done) => {
+    const bin = path.join(__dirname, 'fixtures/pm');
     const proc = spawn(bin, ['listen'], {});
 
     let output = '';
@@ -505,24 +492,24 @@ describe('command', () => {
       // Set another timeout to give 'prog' time to handle the signal
       setTimeout(() => {
         expect(output).toEqual('SIGUSR2\n');
+        done();
       }, 1000);
     }, 2000);
   });
 
-  test.skip('tsnode', () => {
-    const bin = path.join(__dirname, './fixtures-ts/pm.ts');
-
-    // success case
+  test('tsnode', (done) => {
+    const bin = path.join(__dirname, 'fixtures-ts/pm.ts');
     exec(
       `${process.argv[0]} -r ts-node/register ${bin} install`,
       (error, stdout, stderr) => {
         expect(stdout).toEqual('install\n');
+        done();
       }
     );
   });
 
-  test.skip('executableSubcommandAlias help', () => {
-    // success case
+  test('executableSubcommandAlias help', (done) => {
+    const bin = path.join(__dirname, 'fixtures/pm');
     exec(`${bin} help`, (error, stdout, stderr) => {
       expect(stdout).toContain('install|i');
       expect(stdout).toContain('search|s');
@@ -530,103 +517,103 @@ describe('command', () => {
       expect(stdout).toContain('list');
       expect(stdout).toContain('publish|p');
       expect(stdout).not.toContain('pm|');
+      done();
     });
   });
 
-  test.skip('executableSubcommandAlias alias', () => {
-    var bin = path.join(__dirname, './fixtures/pm');
-
-    // success case
-    exec(`${bin} i`, (error, stdout, stderr) => {
-      expect(stdout).toEqual('install\n');
-    });
-
-    // subcommand bin file with explicit extension
-    exec(`${bin} p`, (error, stdout, stderr) => {
-      expect(stdout).toEqual('publish\n');
-    });
-
-    // spawn EACCES
-    exec(`${bin} s`, (error, stdout, { length }) => {
-      // error info are not the same in between <v0.10 and v0.12
-      expect(0).not.toEqual(length);
-    });
-
-    // when `bin` is a symbol link for mocking global install
-    var bin = path.join(__dirname, './fixtures/pmlink');
-    // success case
-    exec(`${bin} i`, (error, stdout, stderr) => {
-      expect(stdout).toEqual('install\n');
-    });
+  test('executableSubcommandAlias alias', async () => {
+    await new Joker()
+      .base(path.join(__dirname, 'fixtures/pm'))
+      .run('i')
+      .stdout('install')
+      .run('p')
+      .stdout('p')
+      .run('s')
+      .stdout('install')
+      .base(path.join(__dirname, 'fixtures/pmlink'))
+      .run('i')
+      .stdout('install')
+      .end();
   });
 
-  test.skip('executableSubcommandDefault', () => {
-    var bin = path.join(__dirname, './fixtures/pm');
+  test('executableSubcommandDefault', async () => {
+    await new Joker()
+      .base(path.join(__dirname, 'fixtures/pm'))
+      .run('default')
+      .stdout('default')
+      .run('')
+      .stdout('default')
+      .run('list')
+      .stderr('\n  pm-list(1) does not exist, try --help\n\n')
+      .base(path.join(__dirname, 'fixtures/pmlink'))
+      .run('install')
+      .stdout('install')
+      .end();
     // success case
-    exec(`${bin} default`, (error, stdout, stderr) => {
-      expect(stdout).toEqual('default\n');
-    });
+    // exec(`${bin} default`, (error, stdout, stderr) => {
+    //   expect(stdout).toEqual('default\n');
+    // });
 
-    // success case (default)
-    exec(bin, (error, stdout, stderr) => {
-      expect(stdout).toEqual('default\n');
-    });
+    // // success case (default)
+    // exec(bin, (error, stdout, stderr) => {
+    //   expect(stdout).toEqual('default\n');
+    // });
 
-    // not exist
-    exec(`${bin} list`, (error, stdout, stderr) => {
-      expect(stderr).toEqual('\n  pm-list(1) does not exist, try --help\n\n');
-      // TODO error info are not the same in between <=v0.8 and later version
-      expect(0).not.toEqual(stderr.length);
-    });
+    // // not exist
+    // exec(`${bin} list`, (error, stdout, stderr) => {
+    //   expect(stderr).toEqual('\n  pm-list(1) does not exist, try --help\n\n');
+    //   // TODO error info are not the same in between <=v0.8 and later version
+    //   expect(0).not.toEqual(stderr.length);
+    // });
 
-    // success case
-    exec(`${bin} install`, (error, stdout, stderr) => {
-      expect(stdout).toEqual('install\n');
-    });
+    // // success case
+    // exec(`${bin} install`, (error, stdout, stderr) => {
+    //   expect(stdout).toEqual('install\n');
+    // });
 
-    // subcommand bin file with explicit extension
-    exec(`${bin} publish`, (error, stdout, stderr) => {
-      expect(stdout).toEqual('publish\n');
-    });
+    // // subcommand bin file with explicit extension
+    // exec(`${bin} publish`, (error, stdout, stderr) => {
+    //   expect(stdout).toEqual('publish\n');
+    // });
 
-    // spawn EACCES
-    exec(`${bin} search`, (error, stdout, { length }) => {
-      // TODO error info are not the same in between <v0.10 and v0.12
-      expect(0).not.toEqual(length);
-    });
+    // // spawn EACCES
+    // exec(`${bin} search`, (error, stdout, { length }) => {
+    //   // TODO error info are not the same in between <v0.10 and v0.12
+    //   expect(0).not.toEqual(length);
+    // });
 
-    // when `bin` is a symbol link for mocking global install
-    var bin = path.join(__dirname, './fixtures/pmlink');
-    // success case
-    exec(`${bin} install`, (error, stdout, stderr) => {
-      expect(stdout).toEqual('install\n');
-    });
+    // // when `bin` is a symbol link for mocking global install
+    // bin = path.join(__dirname, 'fixtures/pmlink');
+    // // success case
+    // exec(`${bin} install`, (error, stdout, stderr) => {
+    //   expect(stdout).toEqual('install\n');
+    // });
   });
 
-  test.skip('executableSubcommandSubcommand', () => {
-    const bin = path.join(__dirname, './fixtures/pm');
-    // should list commands at top-level sub command
-    exec(`${bin} cache help`, (error, stdout) => {
-      expect(stdout).toContain('Usage:');
-      expect(stdout).toContain('cache');
-      expect(stdout).toContain('validate');
-    });
-
-    // should run sub-subcommand
-    exec(`${bin} cache clear`, (error, stdout, stderr) => {
-      expect(stdout).toEqual('cache-clear\n');
-      expect(stderr).toEqual('');
-    });
-
-    // should print the default command when passed invalid sub-subcommand
-    exec(`${bin} cache nope`, (error, stdout, stderr) => {
-      expect(stdout).toEqual('cache-validate\n');
-      expect(stderr).toEqual('');
-    });
+  test('executableSubcommandSubcommand', async () => {
+    await new Joker()
+      .base(path.join(__dirname, 'fixtures/pm'))
+      .run('cache help')
+      .expect(({ stdout }) => {
+        expect(stdout).toContain('Usage:');
+        expect(stdout).toContain('cache');
+        expect(stdout).toContain('validate');
+      })
+      .run('cache clear')
+      .expect(({ stdout }) => {
+        expect(stdout).toEqual('cache-clear\n');
+        expect(stderr).toEqual('');
+      })
+      .run('cache nope')
+      .expect(({ stdout }) => {
+        expect(stdout).toEqual('cache-validate\n');
+        expect(stderr).toEqual('');
+      })
+      .end()
   });
 
-  test.skip('executableSubcommandUnknown', () => {
-    const bin = path.join(__dirname, './fixtures/cmd');
+  test('executableSubcommandUnknown', (done) => {
+    const bin = path.join(__dirname, 'fixtures/cmd');
 
     exec(`${bin} foo`, (error, stdout, stderr) => {
       expect(stdout).toEqual('foo\n');
@@ -635,11 +622,12 @@ describe('command', () => {
     const unknownSubcmd = 'foo_invalid';
     exec(`${bin} ${unknownSubcmd}`, (error, stdout, stderr) => {
       expect(stderr).toEqual(`error: unknown command ${unknownSubcmd}\n`);
+      done();
     });
   });
 
-  test.skip('failOnSameAlias', () => {
-    const bin = path.join(__dirname, './fixtures/cmd');
+  test('failOnSameAlias', (done) => {
+    const bin = path.join(__dirname, 'fixtures/cmd');
 
     exec(`${bin} foo`, (error, stdout, stderr) => {
       expect(stdout).toEqual('foo\n');
@@ -648,15 +636,14 @@ describe('command', () => {
     const unknownSubcmd = 'foo_invalid';
     exec(`${bin} ${unknownSubcmd}`, (error, stdout, stderr) => {
       expect(stderr).toEqual(`error: unknown command ${unknownSubcmd}\n`);
+      done();
     });
   });
 
-  test.only('help', () => {
-    let prog = program().command('bare');
+  test('help', () => {
+    let prog = program().command('bare').commandHelp();
 
-    expect(prog.commandHelp()).toEqual('Commands:\n  bare\n');
-
-    console.log(prog.commandHelp());
+    expect(prog).toEqual('Commands:\n  bare\n');
 
     prog.command('mycommand [options]');
 
@@ -717,7 +704,7 @@ describe('command', () => {
     sinon.restore();
   });
 
-  test.skip('no conflict', () => {
+  test('no conflict', () => {
     let prog = program()
       .version('0.0.1')
       .command('version', 'description')
@@ -806,9 +793,9 @@ describe('command', () => {
 
     const cmd = 'my_command';
 
-    program().command(cmd, 'description');
-
-    program().parse(['node', 'test', cmd]);
+    program()
+      .command(cmd, 'description')
+      .parse(['node', 'test', cmd]);
 
     expect(stubError.callCount).toEqual(0);
     const output = process.stdout.write.args;
