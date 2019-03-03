@@ -14,7 +14,7 @@ export interface AutocompleteEvent {
   reply: (commands: string[]) => void;
 }
 
-export type Args = Array<string | boolean>;
+export type Args = (string | boolean)[];
 
 export interface CompletionRules {
   args: Args;
@@ -264,7 +264,7 @@ export class Command extends EventEmitter {
   public command(
     name: string,
     desc?: string,
-    opts: { isDefault: boolean; noHelp: boolean } = {
+    opts: { isDefault?: boolean; noHelp?: boolean } = {
       isDefault: false,
       noHelp: true
     }
@@ -549,7 +549,7 @@ export class Command extends EventEmitter {
   public complete(rules: {
     options: {};
     arguments: {
-      filename: Array<string>
+      filename: string[];
     };
     args: string[];
   }): Command {
@@ -846,7 +846,11 @@ export class Command extends EventEmitter {
    * @param {Array} args
    * @param {Array} unknown
    */
-  private executeSubCommand(argv: Array<string | boolean>, args: string[], unknown: any[]) {
+  private executeSubCommand(
+    argv: (string | boolean)[],
+    args: string[],
+    unknown: any[]
+  ) {
     args = args.concat(unknown);
 
     if (!args.length) this.help();

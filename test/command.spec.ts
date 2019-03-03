@@ -1,7 +1,7 @@
 import path from 'path';
 import { spawn, exec } from 'child_process';
 import sinonCreator from 'sinon';
-import { default as program, Command } from '../src';
+import { default as program } from '../src';
 
 process.env.COMMANDER_ENV = 'test';
 
@@ -64,7 +64,8 @@ describe('command', () => {
     const stubExit = sinon.stub(process, 'exit');
 
     let prog = program()
-      .version('0.0.1').option('-p, --pepper', 'add pepper')
+      .version('0.0.1')
+      .option('-p, --pepper', 'add pepper')
       .parse('node test -m'.split(' '));
 
     expect(stubError.callCount).toEqual(1);
@@ -77,7 +78,8 @@ describe('command', () => {
     // test subcommand
     resetStubStatus();
     prog = prog
-      .command('sub').action(() => {})
+      .command('sub')
+      .action(() => {})
       .parse('node test sub -m'.split(' '));
 
     expect(stubError.callCount).toEqual(2);
@@ -86,8 +88,10 @@ describe('command', () => {
     // command with `allowUnknownOption`
     resetStubStatus();
     prog = prog
-      .version('0.0.1').option('-p, --pepper', 'add pepper')
-      .allowUnknownOption().parse('node test -m'.split(' '));
+      .version('0.0.1')
+      .option('-p, --pepper', 'add pepper')
+      .allowUnknownOption()
+      .parse('node test -m'.split(' '));
 
     expect(stubError.callCount).toEqual(0);
     expect(stubExit.calledOnce).toBe(false);
@@ -181,7 +185,10 @@ describe('command', () => {
       'file2.c'
     ]);
 
-    expect(program().autocompleteCandidates(['-o'])).toEqual(['file1', 'file2']);
+    expect(program().autocompleteCandidates(['-o'])).toEqual([
+      'file1',
+      'file2'
+    ]);
 
     expect(program().autocompleteCandidates(['--output'])).toEqual([
       'file1',
@@ -257,7 +264,7 @@ describe('command', () => {
   });
 
   test('autocompletion subcommand', () => {
-    program
+    let prog = program()
       .command('clone <url>')
       .option('--debug-level <level>', 'debug level')
       .complete({
@@ -269,7 +276,7 @@ describe('command', () => {
         }
       });
 
-    program
+    prog
       .command('add <file1> <file2>')
       .option('-A', 'add all files')
       .option('--debug-level <level>', 'debug level')
@@ -283,11 +290,11 @@ describe('command', () => {
         }
       });
 
-    expect(program().hasCompletionRules()).toBe(true);
+    expect(prog.hasCompletionRules()).toBe(true);
 
     const rootReply = sinon.spy();
 
-    program().autocompleteHandleEvent({
+    prog.autocompleteHandleEvent({
       reply: rootReply,
       fragment: 1,
       line: 'git'
@@ -298,7 +305,7 @@ describe('command', () => {
 
     const cloneReply = sinon.spy();
 
-    program().autocompleteHandleEvent({
+    prog.autocompleteHandleEvent({
       reply: cloneReply,
       fragment: 2,
       line: 'git clone'
@@ -314,7 +321,7 @@ describe('command', () => {
 
     const cloneWithOptionReply = sinon.spy();
 
-    program().autocompleteHandleEvent({
+    prog.autocompleteHandleEvent({
       reply: cloneWithOptionReply,
       fragment: 3,
       line: 'git clone --debug-level'
@@ -325,7 +332,7 @@ describe('command', () => {
 
     const addReply = sinon.spy();
 
-    program().autocompleteHandleEvent({
+    prog.autocompleteHandleEvent({
       reply: addReply,
       fragment: 2,
       line: 'git add'
@@ -333,7 +340,7 @@ describe('command', () => {
 
     expect(addReply.calledOnce).toBe(true);
     addReply.getCall(0);
-    expect(program().args[0]).toEqual([
+    expect(prog.args[0]).toEqual([
       '-A',
       '--debug-level',
       'file1.c',
@@ -342,7 +349,7 @@ describe('command', () => {
 
     const addWithArgReply = sinon.spy();
 
-    program().autocompleteHandleEvent({
+    prog.autocompleteHandleEvent({
       reply: addWithArgReply,
       fragment: 3,
       line: 'git add file1.c'
@@ -350,7 +357,7 @@ describe('command', () => {
 
     expect(addWithArgReply.calledOnce).toBe(true);
     addWithArgReply.getCall(0);
-    expect(program().args[0]).toEqual([
+    expect(prog.args[0]).toEqual([
       '-A',
       '--debug-level',
       'file2.c',
@@ -649,7 +656,7 @@ describe('command', () => {
 
     expect(prog.commandHelp()).toEqual('Commands:\n  bare\n');
 
-    console.log(prog.commandHelp())
+    console.log(prog.commandHelp());
 
     prog.command('mycommand [options]');
 
@@ -678,8 +685,9 @@ describe('command', () => {
   });
 
   test('name', () => {
-
-    program().command('mycommand [options]', 'this is my command').parse(['node', 'test']);
+    program()
+      .command('mycommand [options]', 'this is my command')
+      .parse(['node', 'test']);
 
     expect(program().name).toBeInstanceOf(Function);
     expect(program().name()).toEqual('test');
@@ -696,7 +704,6 @@ describe('command', () => {
   });
 
   test('name set', () => {
-
     const prog = program()
       .name('foobar')
       .description('This is a test.');
@@ -711,7 +718,6 @@ describe('command', () => {
   });
 
   test.skip('no conflict', () => {
-
     let prog = program()
       .version('0.0.1')
       .command('version', 'description')
@@ -732,22 +738,18 @@ describe('command', () => {
   });
 
   test('no help', () => {
-
     let prog = program()
       .command('mycommand [options]', 'this is my command')
-
       .command('anothercommand [options]')
       .action(() => {})
-
       .command('hiddencommand [options]', "you won't see me", {
         noHelp: true
       })
       .command('hideagain [options]', null, { noHelp: true })
-      .action(() => {});
-
-    program().command('hiddencommandwithoutdescription [options]', {
-      noHelp: true
-    });
+      .action(() => {})
+      .command('hiddencommandwithoutdescription [options]', {
+        noHelp: true
+      });
 
     program().parse(['node', 'test']);
 
@@ -776,13 +778,13 @@ describe('command', () => {
 
     const output = process.stdout.write.args[0];
 
-    const expect = [
+    const expectation = [
       'Commands:',
       '  mycommand [options]       this is my command',
       '  anothercommand [options]',
       '  help [cmd]                display help for [cmd]'
     ].join('\n');
-    expect(output[0].indexOf(expect)).not.toEqual(-1);
+    expect(output[0]).not.toContain(expectation);
   });
 
   test('command asterisk', () => {
@@ -800,7 +802,6 @@ describe('command', () => {
   });
 
   test('known', () => {
-
     const stubError = sinon.stub(console, 'error');
 
     const cmd = 'my_command';
@@ -825,7 +826,7 @@ describe('command', () => {
       })
       .parse(['node', 'test']);
 
-    expect(prog.color).toEqual(val);
+    expect(prog.get('color')).toEqual(val);
   });
 
   test('literal', () => {
