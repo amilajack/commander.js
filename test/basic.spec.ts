@@ -3,7 +3,7 @@ import Joker from '@amilajack/joker';
 const cmdFixture = require.resolve('./fixtures/cmd');
 const pmFixture = require.resolve('./fixtures/pm');
 
-describe('Basic', () => {
+describe('E2E', () => {
   it('should get version', async () => {
     await new Joker()
       .base('node ')

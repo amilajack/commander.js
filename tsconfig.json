@@ -1,28 +1,27 @@
 {
-    "compilerOptions": {
-      "noEmit": true,
-      "moduleResolution": "node",
-      "module": "commonjs",
-      "esModuleInterop": true,
-      "target": "esnext",
-      "allowJs": false,
-      "outDir": "dist",
-      "declaration": true,
-      "suppressImplicitAnyIndexErrors": true,
-      "allowSyntheticDefaultImports": true,
-      "strictNullChecks": true,
-      "noImplicitReturns": true,
-      "noImplicitThis": true,
-      "allowUnreachableCode": false,
-      "noUnusedLocals": true,
-      "noUnusedParameters": true,
-      "noImplicitAny": true,
-      "removeComments": true,
-      "preserveConstEnums": true,
-      "sourceMap": true,
-      "resolveJsonModule": true
-    },
-    "include": ["**/*"],
-    "exclude": ["node_modules"]
-  }
-  
+  "compilerOptions": {
+    "noEmit": true,
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "target": "esnext",
+    "allowJs": false,
+    "outDir": "dist",
+    "declaration": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "allowSyntheticDefaultImports": true,
+    "strictNullChecks": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "allowUnreachableCode": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "resolveJsonModule": true
+  },
+  "include": ["**/*"],
+  "exclude": ["node_modules"]
+}
