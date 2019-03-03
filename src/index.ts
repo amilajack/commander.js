@@ -6,87 +6,142 @@ import { EventEmitter } from 'events';
 import { spawn, ChildProcess } from 'child_process';
 import path from 'path';
 import fs from 'fs';
+import Option from './option';
 
-interface AutocompleteEvent {
+export interface AutocompleteEvent {
   fragment: number;
   line: string;
   reply: (commands: string[]) => void;
 }
 
-/**
- * Initialize a new [[Option]] with the given `flags` and `description`.
- *
- * @param {String} flags
- * @param {String} description
- * @public
- */
+export type Args = Array<string | boolean>;
 
-export class Option {
-  private flags: string;
-
-  required: boolean;
-
-  optional: boolean;
-
-  bool: boolean;
-
-  private short: string;
-
-  private long: string;
-
-  private description: string;
-
-  private defaultValue: string;
-
-  public constructor(flags: string, description: string) {
-    this.flags = flags;
-    this.required = flags.includes('<');
-    this.optional = flags.includes('[');
-    this.bool = !flags.includes('-no-');
-    const parsedFlags = flags.split(/[ ,|]+/);
-    if (parsedFlags.length > 1 && !/^[[<]/.test(parsedFlags[1])) {
-      this.short = parsedFlags.shift() || '';
-    }
-    this.long = parsedFlags.shift() || '';
-    this.description = description || '';
-  }
-
-  /**
-   * Return option name.
-   */
-  private name(): string {
-    return this.long.replace('--', '').replace('no-', '');
-  }
-
-  /**
-   * Return option name, in a camelcase format that can be used
-   * as a object attribute key.
-   */
-  public attributeName(): string {
-    return camelcase(this.name());
-  }
-
-  /**
-   * Check if `arg` matches the short or long flag.
-   */
-  is(arg: string): boolean {
-    return this.short === arg || this.long === arg;
-  }
-
-  /**
-   * Returns number of args that are expected by the option.
-   * Can only be 0 or 1.
-   */
-  public arity(): number {
-    return this.required || this.optional ? 1 : 0;
-  }
-}
-
-interface CompletionRules {
-  args: string[];
+export interface CompletionRules {
+  args: Args;
   options: {
     [x: string]: string;
   };
+}
+
+function processExit(code: number) {
+  if (process.env.COMMANDER_ENV !== 'test') {
+    process.exit(code);
+  }
+}
+
+/**
+ * Pad `str` to `width`.
+ *
+ * @param {String} str
+ * @param {Number} width
+ * @return {String}
+ */
+function pad(str: string, width: number): string {
+  const len = Math.max(0, width - str.length);
+  return str + Array(len + 1).join(' ');
+}
+
+/**
+ * Output help information if necessary
+ *
+ * @param {Command} command to output help for
+ * @param {Array} array of options to search for -h or --help
+ */
+function outputHelpIfNecessary(cmd: Command, options: string[] = []) {
+  for (let i = 0; i < options.length; i++) {
+    if (options[i] === '--help' || options[i] === '-h') {
+      cmd.outputHelp();
+      processExit(0);
+    }
+  }
+}
+
+/**
+ * Takes an argument an returns its human readable equivalent for help usage.
+ *
+ * @param {Object} arg
+ * @return {String}
+ */
+function humanReadableArgName({
+  name,
+  variadic,
+  required
+}: {
+  name: string;
+  variadic: boolean;
+  required: boolean;
+}): string {
+  const nameOutput = name + (variadic === true ? '...' : '');
+
+  return required ? `<${nameOutput}>` : `[${nameOutput}]`;
+}
+
+/**
+ * Detect whether current command line input infers an option.
+ *
+ * @param {Object} normalized option rules
+ * @param {Array} typed args
+ * @return {Object} active option if found, otherwise false
+ */
+function autocompleteActiveOption(
+  optionRules: Record<string, any>,
+  typedArgs: string[]
+): boolean | { reply: Record<string, any> } {
+  if (typedArgs.length === 0) {
+    return false;
+  }
+
+  const lastArg = typedArgs[typedArgs.length - 1];
+
+  if (!optionRules[lastArg]) {
+    return false;
+  }
+
+  const option = optionRules[lastArg];
+
+  if (option.arity === 0) {
+    return false;
+  }
+
+  return option;
+}
+
+/**
+ * Detect whether current command line input infers an arg.
+ *
+ * @param {Object} normalized option rules
+ * @param {Array} normalized arg rules
+ * @param {Array} typed args
+ * @return {Object} active arg if found, otherwise false
+ */
+function autocompleteActiveArg(
+  optionRules: Record<string, any>,
+  argRules: string[],
+  typedArgs: string[]
+): Record<string, any> {
+  if (argRules.length === 0) {
+    return false;
+  }
+
+  // find out how many args have already been typed
+  let count = 0;
+  let curr = 0;
+
+  while (curr < typedArgs.length) {
+    const currStr = typedArgs[curr];
+
+    if (optionRules[currStr]) {
+      curr += optionRules[currStr].arity + 1;
+    } else {
+      count += 1;
+      curr += 1;
+    }
+  }
+
+  if (argRules.length > count) {
+    return argRules[count];
+  }
+  return false;
 }
 
 /**
@@ -116,7 +171,7 @@ export class Command extends EventEmitter {
 
   private noHelp: boolean;
 
-  private execs: Record<string, any> = {};
+  private execs: Record<string, boolean> = {};
 
   private argsDescription: Record<string, any> | undefined;
 
@@ -214,7 +269,7 @@ export class Command extends EventEmitter {
       noHelp: true
     }
   ): Command {
-    if (typeof desc === 'object' && desc !== null) {
+    if (typeof desc === 'object' && desc != null) {
       opts = desc;
       desc = undefined;
     }
@@ -258,7 +313,8 @@ export class Command extends EventEmitter {
    * For example `["[type]"]` becomes `[{ required: false, name: 'type' }]`.
    */
   public parseExpectedArgs(args: string[]): Command {
-    if (!args.length) return;
+    if (!args.length) this;
+
     args.forEach(arg => {
       const argDetails = {
         required: false,
@@ -302,7 +358,7 @@ export class Command extends EventEmitter {
    * @param {Function} fn
    * @return {Command} for chaining
    */
-  action(fn: Function): Command {
+  public action(fn: Function): Command {
     const listener = (args: string[] = [], unknown: string[] = []) => {
       const parsed = this.parseOptions(unknown);
 
@@ -320,7 +376,7 @@ export class Command extends EventEmitter {
       if (parsed.args.length) args = parsed.args.concat(args);
 
       this._args.forEach((arg, i) => {
-        if (arg.required && args[i] === null) {
+        if (arg.required && args[i] == null) {
           this.missingArgument(arg.name);
         } else if (arg.variadic) {
           if (i !== this._args.length - 1) {
@@ -396,14 +452,14 @@ export class Command extends EventEmitter {
    * @param {*} [defaultValue]
    * @return {Command} for chaining
    */
-  option(
+  public option(
     flags: string,
     description: string,
     fn?: Function | RegExp,
     defaultValue?: any
   ): Command {
     const option = new Option(flags, description);
-    const oname = option.name();
+    const optionName = option.name();
     const name = option.attributeName();
 
     // default as 3rd arg
@@ -416,7 +472,6 @@ export class Command extends EventEmitter {
         };
       } else {
         defaultValue = fn;
-        fn = null;
       }
     }
 
@@ -436,9 +491,9 @@ export class Command extends EventEmitter {
 
     // when it's passed assign the value
     // and conditionally invoke the callback
-    this.on(`option:${oname}`, val => {
+    this.on(`option:${optionName}`, val => {
       // coercion
-      if (val !== null && fn && typeof fn === 'function') {
+      if (val != null && typeof fn === 'function') {
         val = fn(val, this[name] === undefined ? defaultValue : this[name]);
       }
 
@@ -448,18 +503,31 @@ export class Command extends EventEmitter {
         typeof this[name] === 'undefined'
       ) {
         // if no value, bool true, and we have a default, then use it!
-        if (val === null) {
+        if (val == null) {
           this[name] = option.bool ? defaultValue || true : false;
         } else {
           this[name] = val;
         }
-      } else if (val !== null) {
+      } else if (val != null) {
         // reassign
         this[name] = val;
       }
     });
 
     return this;
+  }
+
+  /**
+   * Get the value of an option
+   *
+   * @param name - The name of the option you want to get
+   * @returns the value of the requested option
+   */
+  public get(name: string): boolean | string | number {
+    if (!(name in this)) {
+      throw new Error(`Option "${name}" does not exist`);
+    }
+    return this[name];
   }
 
   /**
@@ -480,7 +548,9 @@ export class Command extends EventEmitter {
    */
   public complete(rules: {
     options: {};
-    arguments: string[];
+    arguments: {
+      filename: Array<string>
+    };
     args: string[];
   }): Command {
     // merge options
@@ -504,7 +574,7 @@ export class Command extends EventEmitter {
    *
    * @return {Boolean}
    */
-  private hasCompletionRules(): boolean {
+  public hasCompletionRules(): boolean {
     function isEmptyRule({
       options,
       args
@@ -705,7 +775,7 @@ export class Command extends EventEmitter {
    * @param {Array} argv
    * @return {Command} for chaining
    */
-  public parse(argv: string[]): Command | void {
+  public parse(argv: (string | boolean)[]): Command {
     // trigger autocomplete first if some completion rules have been defined
     if (this.hasCompletionRules()) {
       this.autocomplete(argv);
@@ -744,17 +814,20 @@ export class Command extends EventEmitter {
     }
 
     if (this.execs[name] && typeof this.execs[name] !== 'function') {
-      return this.executeSubCommand(argv, args, parsed.unknown);
+      this.executeSubCommand(argv, args, parsed.unknown);
+      return this;
     }
     if (aliasCommand && typeof aliasCommand._name === 'string') {
       // is alias of a subCommand
       args[0] = aliasCommand._name;
-      return this.executeSubCommand(argv, args, parsed.unknown);
+      this.executeSubCommand(argv, args, parsed.unknown);
+      return this;
     }
     if (this.defaultExecutable) {
       // use the default subcommand
       args.unshift(this.defaultExecutable);
-      return this.executeSubCommand(argv, args, parsed.unknown);
+      this.executeSubCommand(argv, args, parsed.unknown);
+      return this;
     }
 
     // Output unknown command error
@@ -773,7 +846,7 @@ export class Command extends EventEmitter {
    * @param {Array} args
    * @param {Array} unknown
    */
-  private executeSubCommand(argv: string[], args: string[], unknown: any[]) {
+  private executeSubCommand(argv: Array<string | boolean>, args: string[], unknown: any[]) {
     args = args.concat(unknown);
 
     if (!args.length) this.help();
@@ -844,7 +917,7 @@ export class Command extends EventEmitter {
     ];
     signals.forEach(signal => {
       process.on(signal, () => {
-        if (proc.killed === false && proc.exitCode === null) {
+        if (proc.killed === false && proc.exitCode == null) {
           proc.kill(signal);
         }
       });
@@ -860,7 +933,7 @@ export class Command extends EventEmitter {
         );
       }
       if (process.env.NODE_ENV !== 'test') {
-        process.exit(1);
+        processExit(1);
       }
     });
 
@@ -951,17 +1024,14 @@ export class Command extends EventEmitter {
   }
 
   /**
-   * Return an option matching `arg` if any.
+   * Return an [[Option]] matching `arg` if any.
    *
    * @param {String} arg
    * @return {Option}
    */
-  private optionFor(arg: string): Option | void {
-    for (let i = 0, len = this.options.length; i < len; ++i) {
-      if (this.options[i].is(arg)) {
-        return this.options[i];
-      }
-    }
+  private optionFor(arg: string): Option | undefined {
+    const option = this.options.find(option => option.is(arg));
+    return option;
   }
 
   /**
@@ -1003,12 +1073,13 @@ export class Command extends EventEmitter {
         // requires arg
         if (option.required) {
           arg = argv[++i];
-          if (arg === null) return this.optionMissingArgument(option);
+          if (arg == null) return this.optionMissingArgument(option);
           this.emit(`option:${option.name()}`, arg);
           // optional arg
         } else if (option.optional) {
           arg = argv[i + 1];
-          if (arg === null || (arg[0] === '-' && arg !== '-')) {
+          // no arg provided
+          if (arg == null || (arg && arg[0] === '-' && arg !== '-')) {
             arg = null;
           } else {
             ++i;
@@ -1064,7 +1135,7 @@ export class Command extends EventEmitter {
    */
   private missingArgument(name: string) {
     console.error('error: missing required argument `%s`', name);
-    process.exit(1);
+    processExit(1);
   }
 
   /**
@@ -1083,7 +1154,7 @@ export class Command extends EventEmitter {
     } else {
       console.error('error: option `%s` argument missing', flags);
     }
-    process.exit(1);
+    processExit(1);
   }
 
   /**
@@ -1094,7 +1165,7 @@ export class Command extends EventEmitter {
   private unknownOption(flag: string) {
     if (this._allowUnknownOption) return;
     console.error('error: unknown option `%s`', flag);
-    process.exit(1);
+    processExit(1);
   }
 
   /**
@@ -1104,7 +1175,7 @@ export class Command extends EventEmitter {
    */
   private variadicArgNotLast(name: string) {
     console.error('error: variadic arguments must be last `%s`', name);
-    process.exit(1);
+    processExit(1);
   }
 
   /**
@@ -1118,7 +1189,6 @@ export class Command extends EventEmitter {
    * @return {Command} for chaining
    */
   public version(str: string, flags?: string): Command {
-    if (!str) return this._version;
     this._version = str;
     flags = flags || '-V, --version';
     const versionOption = new Option(flags, 'output the version number');
@@ -1126,7 +1196,7 @@ export class Command extends EventEmitter {
     this.options.push(versionOption);
     this.on(`option:${this.versionOptionName}`, () => {
       process.stdout.write(`${str}\n`);
-      process.exit(0);
+      processExit(0);
     });
     return this;
   }
@@ -1141,8 +1211,7 @@ export class Command extends EventEmitter {
   public description(
     str: string,
     argsDescription?: Record<string, any>
-  ): string | Command {
-    if (arguments.length === 0) return this._description;
+  ): Command {
     this._description = str;
     this.argsDescription = argsDescription;
     return this;
@@ -1199,8 +1268,7 @@ export class Command extends EventEmitter {
    * @param {String} str
    * @return {String|Command}
    */
-  name(str?: string): undefined | string | Command {
-    if (!str) return this._name;
+  name(str?: string): Command {
     this._name = str;
     return this;
   }
@@ -1397,141 +1465,14 @@ export class Command extends EventEmitter {
    */
   public help(cb?: (a: string) => string) {
     this.outputHelp(cb);
-    process.exit();
+    processExit();
   }
-}
-
-/**
- * Camel-case the given `flag`
- *
- * @param {String} flag
- * @return {String}
- */
-function camelcase(flag: string): string {
-  return flag
-    .split('-')
-    .reduce(
-      (str: string, word: string) => str + word[0].toUpperCase() + word.slice(1)
-    );
-}
-
-/**
- * Pad `str` to `width`.
- *
- * @param {String} str
- * @param {Number} width
- * @return {String}
- */
-function pad(str: string, width: number): string {
-  const len = Math.max(0, width - str.length);
-  return str + Array(len + 1).join(' ');
-}
-
-/**
- * Output help information if necessary
- *
- * @param {Command} command to output help for
- * @param {Array} array of options to search for -h or --help
- */
-function outputHelpIfNecessary(cmd: Command, options: string[] = []) {
-  for (let i = 0; i < options.length; i++) {
-    if (options[i] === '--help' || options[i] === '-h') {
-      cmd.outputHelp();
-      process.exit(0);
-    }
-  }
-}
-
-/**
- * Takes an argument an returns its human readable equivalent for help usage.
- *
- * @param {Object} arg
- * @return {String}
- */
-function humanReadableArgName({
-  name,
-  variadic,
-  required
-}: {
-  name: string;
-  variadic: boolean;
-  required: boolean;
-}): string {
-  const nameOutput = name + (variadic === true ? '...' : '');
-
-  return required ? `<${nameOutput}>` : `[${nameOutput}]`;
-}
-
-/**
- * Detect whether current command line input infers an option.
- *
- * @param {Object} normalized option rules
- * @param {Array} typed args
- * @return {Object} active option if found, otherwise false
- */
-function autocompleteActiveOption(
-  optionRules: Record<string, any>,
-  typedArgs: string[]
-): boolean | { reply: Record<string, any> } {
-  if (typedArgs.length === 0) {
-    return false;
-  }
-
-  const lastArg = typedArgs[typedArgs.length - 1];
-
-  if (!optionRules[lastArg]) {
-    return false;
-  }
-
-  const option = optionRules[lastArg];
-
-  if (option.arity === 0) {
-    return false;
-  }
-
-  return option;
-}
-
-/**
- * Detect whether current command line input infers an arg.
- *
- * @param {Object} normalized option rules
- * @param {Array} normalized arg rules
- * @param {Array} typed args
- * @return {Object} active arg if found, otherwise false
- */
-function autocompleteActiveArg(
-  optionRules: Record<string, any>,
-  argRules: string[],
-  typedArgs: string[]
-): Record<string, any> {
-  if (argRules.length === 0) {
-    return false;
-  }
-
-  // find out how many args have already been typed
-  let count = 0;
-  let curr = 0;
-
-  while (curr < typedArgs.length) {
-    const currStr = typedArgs[curr];
-
-    if (optionRules[currStr]) {
-      curr += optionRules[currStr].arity + 1;
-    } else {
-      count += 1;
-      curr += 1;
-    }
-  }
-
-  if (argRules.length > count) {
-    return argRules[count];
-  }
-  return false;
 }
 
 /**
  * Expose the root command.
  */
 
-export default new Command();
+export default function CommandFactory(name?: string) {
+  return new Command(name);
+}

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import program from '../src';
+import { default as program } from '../src';
 
 let cmdValue;
 let envValue;
