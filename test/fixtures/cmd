@@ -2,7 +2,7 @@
 
 const { default: program } = require('../../');
 
-program
+program()
   .version('0.0.1')
   .command('foo [name]', 'dummy command to test unknown command')
   .parse(process.argv);
