@@ -4,7 +4,7 @@ const cmdFixture = require.resolve('./fixtures/cmd');
 const pmFixture = require.resolve('./fixtures/pm');
 
 describe('E2E', () => {
-  it('should get version', async () => {
+  it.concurrent('should get version', async () => {
     await new Joker()
       .base(`node ${cmdFixture}`)
       .run('--version')
@@ -16,7 +16,7 @@ describe('E2E', () => {
       .end();
   });
 
-  it('should do basic stuff', async () => {
+  it.concurrent('should do basic stuff', async () => {
     await new Joker()
       .base(`node ${pmFixture}`)
       .run('--version')

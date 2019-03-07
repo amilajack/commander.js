@@ -1,4 +1,4 @@
-import program from '../../src';
+const { default: program } = require('../../');
 
 program()
   .command('clear', 'clear the cache')

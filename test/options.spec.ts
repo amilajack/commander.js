@@ -10,10 +10,10 @@ function parseRange(str: string) {
 
 describe('basic', () => {
   beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => {});
-    jest.spyOn(console, 'log').mockImplementation(() => {});
-    jest.spyOn(process.stderr, 'write').mockImplementation(() => {});
-    jest.spyOn(process.stdout, 'write').mockImplementation(() => {});
+    // jest.spyOn(console, 'error').mockImplementation(() => {});
+    // jest.spyOn(console, 'log').mockImplementation(() => {});
+    // jest.spyOn(process.stderr, 'write').mockImplementation(() => {});
+    // jest.spyOn(process.stdout, 'write').mockImplementation(() => {});
   });
 
   test('basic', () => {

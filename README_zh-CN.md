@@ -24,7 +24,7 @@
  * Module dependencies.
  */
 
-const program = require('commander');
+const { default: program } = require('commander');
 
 program
   .version('0.0.1')
@@ -110,7 +110,7 @@ console.log(' drink: %j', program.drink);
  * Module dependencies.
  */
 
-const program = require('commander');
+const { default: program } = require('commander');
 
 program
   .version('0.0.1')
@@ -133,7 +133,7 @@ program.parse(process.argv);
 ```js
 #!/usr/bin/env node
 
-const program = require('../');
+const { default: program } = require('../');
 
 program
   .version('0.0.1')
@@ -158,7 +158,7 @@ console.log('environment:', envValue || "no environment given");
 
 ```js
 // file: ./examples/pm
-const program = require('..');
+const { default: program } = require('..');
 
 program
   .version('0.0.1')
@@ -246,7 +246,7 @@ Options:
  * Module dependencies.
  */
 
-const program = require('commander');
+const { default: program } = require('commander');
 
 program
   .version('0.0.1')
@@ -293,7 +293,7 @@ Examples:
 如果你想显示默认的帮助（例如，如果没有提供命令），你可以使用类似的东西：
 
 ```js
-const program = require('commander');
+const { default: program } = require('commander');
 const colors = require('colors');
 
 program
@@ -318,7 +318,7 @@ function make_red(txt) {
 ## 例子
 
 ```js
-const program = require('commander');
+const { default: program } = require('commander');
 
 program
   .version('0.0.1')

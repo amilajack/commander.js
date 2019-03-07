@@ -7,6 +7,13 @@
 
 A modern fork of commander.js
 
+## Goals
+
+* **Customizability**: Users can override the built in templates (.i.e default help prompt template) by importing templates
+* **Type Safe**: Improved compatibility with type systems
+* **Improved Documentation**: Provide a plethora of examples along with high quality API docs
+* **Coloring**: Built in support for colored output
+
 ## Docs
 
 See the [API documentation](https://amilajack.github.io/commander.js/)
@@ -24,3 +31,8 @@ If this project is saving you (or your team) time, please consider supporting it
     <img src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" width="160">
   </a>
 </p>
+
+## Prior Art
+
+* [commander.js](https://github.com/tj/commander.js/)
+* [oclif](https://github.com/oclif/oclif)
