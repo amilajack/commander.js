@@ -1,8 +1,7 @@
 /**
  * Camel-case the given `flag`
  *
- * @param {String} flag
- * @return {String}
+ * @param flag
  */
 function camelcase(flag: string): string {
   return flag
@@ -15,9 +14,8 @@ function camelcase(flag: string): string {
 /**
  * Initialize a new [[Option]] with the given `flags` and `description`.
  *
- * @param {String} flags
- * @param {String} description
- * @public
+ * @param flags
+ * @param description
  */
 
 export default class Option {
