@@ -36,3 +36,8 @@ If this project is saving you (or your team) time, please consider supporting it
 
 * [commander.js](https://github.com/tj/commander.js/)
 * [oclif](https://github.com/oclif/oclif)
+
+## Related
+
+* [**joker**](https://github.com/amilajack/joker/): A modern and intuitive testing library for command-line apps
+* [**ink**](https://github.com/vadimdemedes/ink/): React for interactive command-line apps
