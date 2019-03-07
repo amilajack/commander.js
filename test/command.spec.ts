@@ -8,6 +8,8 @@ process.env.COMMANDER_ENV = 'test';
 
 const sinon = {};
 
+jest.setTimeout(10000);
+
 describe('command', () => {
 
   beforeEach(() => {
@@ -19,6 +21,7 @@ describe('command', () => {
   });
 
   test('commands', () => {
+    let val;
     const prog = program()
       .name('test')
       .command('mycommand')
@@ -28,12 +31,13 @@ describe('command', () => {
       })
       .parse(['node', 'test', 'mycommand', '--cheese', '']);
 
-    expect(prog).toHaveProperty('commands', ['mycommand']);
+    expect(prog).toHaveProperty('commands', expect.any(Object));
+    expect(val).toEqual('');
   });
 
   test('empty action', () => {
     let val = 'some cheese';
-    program()
+    const prog = program()
       .name('test')
       .command('mycommand')
       .option('-c, --cheese [type]', 'optionally specify the type of cheese')
@@ -42,6 +46,7 @@ describe('command', () => {
       })
       .parse(['node', 'test', 'mycommand', '--cheese', '']);
 
+    expect(prog.get('cheese')).toEqual('adfs');
     expect(val).toEqual('');
   });
 
@@ -55,6 +60,7 @@ describe('command', () => {
       })
       .parse(['node', 'test', 'info']);
 
+    expect(prog.commands).toHaveLength(1);
     expect(prog.commands[0].color).toEqual(val);
   });
 
@@ -383,7 +389,7 @@ describe('command', () => {
     ]);
   });
 
-  test('executableSubcommand', async () => {
+  test.concurrent('executableSubcommand', async () => {
     const bin = path.join(__dirname, 'fixtures/pm');
     await new Joker()
       .base(bin)
@@ -524,20 +530,24 @@ describe('command', () => {
     );
   });
 
-  test('executableSubcommandAlias help', (done) => {
+  test.concurrent('executableSubcommandAlias help', async () => {
     const bin = path.join(__dirname, 'fixtures/pm');
-    exec(`${bin} help`, (error, stdout, stderr) => {
-      expect(stdout).toContain('install|i');
-      expect(stdout).toContain('search|s');
-      expect(stdout).toContain('cache|c');
-      expect(stdout).toContain('list');
-      expect(stdout).toContain('publish|p');
-      expect(stdout).not.toContain('pm|');
-      done();
-    });
+    await new Joker()
+      .base(bin)
+      .run('help')
+      .expect(({ stdout, stderr }) => {
+        expect(stdout).toContain('install|i');
+        expect(stdout).toContain('search|s');
+        expect(stdout).toContain('cache|c');
+        expect(stdout).toContain('list');
+        expect(stdout).toContain('publish|p');
+        expect(stdout).not.toContain('pm|');
+        expect(stderr).toEqual('');
+      })
+      .end();
   });
 
-  test('executableSubcommandAlias alias', async () => {
+  test.concurrent('executableSubcommandAlias alias', async () => {
     await new Joker()
       .base(path.join(__dirname, 'fixtures/pm'))
       .run('i')
@@ -552,7 +562,7 @@ describe('command', () => {
       .end();
   });
 
-  test('executableSubcommandDefault', async () => {
+  test.concurrent('executableSubcommandDefault', async () => {
     await new Joker()
       .base(path.join(__dirname, 'fixtures/pm'))
       .run('default')
@@ -606,23 +616,24 @@ describe('command', () => {
     // });
   });
 
-  test('executableSubcommandSubcommand', async () => {
+  test.concurrent('executableSubcommandSubcommand', async () => {
     await new Joker()
       .base(path.join(__dirname, 'fixtures/pm'))
       .run('cache help')
-      .expect(({ stdout }) => {
+      .expect(({ stdout, stderr }) => {
         expect(stdout).toContain('Usage:');
         expect(stdout).toContain('cache');
         expect(stdout).toContain('validate');
+        expect(stderr).toEqual('');
       })
       .run('cache clear')
-      .expect(({ stdout }) => {
+      .expect(({ stdout, stderr }) => {
         expect(stdout).toEqual('cache-clear\n');
         expect(stderr).toEqual('');
       })
       .run('cache nope')
-      .expect(({ stdout }) => {
-        expect(stdout).toEqual('cache-validate\n');
+      .expect(({ stdout, stderr }) => {
+        expect(stdout).toEqual('cache-validate');
         expect(stderr).toEqual('');
       })
       .end()
@@ -657,9 +668,9 @@ describe('command', () => {
   });
 
   test('help', () => {
-    let prog = program().command('bare').commandHelp();
+    let prog = program().command('bare');
 
-    expect(prog).toEqual('Commands:\n  bare\n');
+    expect(prog.commandHelp()).toEqual('Commands:\n  bare\n');
 
     prog.command('mycommand [options]');
 
@@ -670,6 +681,7 @@ describe('command', () => {
 
   test('helpInformation', () => {
     const prog = program().command('somecommand').command('anothercommand [options]');
+    expect(prog.commands).toHaveLength(2);
 
     const expectedHelpInformation = [
       'Usage:  [options] [command]',
@@ -770,17 +782,17 @@ describe('command', () => {
     expect(prog.name).toBeInstanceOf(Function);
     expect(prog.name()).toEqual('test');
     expect(prog.commands[0].name()).toEqual('mycommand');
-    expect(prog.commands[0]._noHelp).toBe(false);
+    expect(prog.commands[0].noHelp).toBe(false);
     expect(prog.commands[1].name()).toEqual('anothercommand');
-    expect(prog.commands[1]._noHelp).toBe(false);
+    expect(prog.commands[1].noHelp).toBe(false);
     expect(prog.commands[2].name()).toEqual('hiddencommand');
-    expect(prog.commands[2]._noHelp).toBe(true);
+    expect(prog.commands[2].noHelp).toBe(true);
     expect(prog.commands[3].name()).toEqual('hideagain');
-    expect(prog.commands[3]._noHelp).toBe(true);
+    expect(prog.commands[3].noHelp).toBe(true);
     expect(prog.commands[4].name()).toEqual(
       'hiddencommandwithoutdescription'
     );
-    expect(prog.commands[4]._noHelp).toBe(true);
+    expect(prog.commands[4].noHelp).toBe(true);
     expect(prog.commands[5].name()).toEqual('help');
 
     sinon.restore();

@@ -266,22 +266,24 @@ export class Command extends EventEmitter {
     desc?: string,
     opts: { isDefault?: boolean; noHelp?: boolean } = {
       isDefault: false,
-      noHelp: true
+      noHelp: false
     }
   ): Command {
     if (typeof desc === 'object' && desc != null) {
       opts = desc;
-      desc = undefined;
+      desc = null;
     }
     opts = opts || {};
     const args = name.split(/ +/);
     const cmd = new Command(args.shift());
 
-    if (desc) {
+    if (desc && cmd._name) {
       cmd.description(desc);
       this.executables = true;
       this.execs[cmd._name] = true;
-      if (opts.isDefault) this.defaultExecutable = cmd._name;
+      if (opts.isDefault) {
+        this.defaultExecutable = cmd._name;
+      }
     }
     cmd.noHelp = !!opts.noHelp;
     this.commands.push(cmd);
@@ -289,7 +291,7 @@ export class Command extends EventEmitter {
     cmd.parent = this;
 
     if (desc) return this;
-    return cmd;
+    return this;
   }
 
   /**
