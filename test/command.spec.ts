@@ -4,7 +4,7 @@ import Joker from '@amilajack/joker';
 import { default as program } from '../src';
 // import mockProcess from 'jest-mock-process';
 
-process.env.COMMANDER_ENV = 'test';
+process.env.DARK_ENV = 'test';
 
 const sinon = {};
 

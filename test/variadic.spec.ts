@@ -1,7 +1,7 @@
 import util from 'util';
 import { default as program } from '../src';
 
-process.env.COMMANDER_ENV = 'test';
+process.env.DARK_ENV = 'test';
 
 describe.skip('variadic', () => {
   test('args', () => {

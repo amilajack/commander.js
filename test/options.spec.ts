@@ -2,7 +2,7 @@ import { default as program } from '../src';
 import Option from '../src/option';
 import sinonCreator from 'sinon';
 
-process.env.COMMANDER_ENV = 'test';
+process.env.DARK_ENV = 'test';
 
 function parseRange(str: string) {
   return str.split('..').map(Number);

@@ -20,7 +20,7 @@ export interface CompletionRules {
 }
 
 function processExit(code: number) {
-  if (process.env.COMMANDER_ENV !== 'test') {
+  if (process.env.DARK_ENV !== 'test') {
     process.exit(code);
   }
 }
