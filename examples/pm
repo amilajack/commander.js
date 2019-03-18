@@ -2,7 +2,7 @@
 
 const { default: program } = require('..');
 
-program
+program()
   .version('0.0.1')
   .description('Fake package manager')
   .command('install [name]', 'install one or more packages')

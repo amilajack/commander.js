@@ -1,5 +1,5 @@
 import util from 'util';
-import { default as program } from '../src';
+import program from '../src';
 
 process.env.DARK_ENV = 'test';
 

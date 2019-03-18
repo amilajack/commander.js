@@ -4,9 +4,9 @@
  * Module dependencies.
  */
 
-import { default as program } from '../src';
+const { default: program } = require('..');
 
-program
+program()
   .version('0.0.1')
   .option('-f, --foo', 'enable some foo')
   .option('-b, --bar', 'enable some bar')

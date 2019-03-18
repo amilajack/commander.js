@@ -4,13 +4,13 @@
  * Module dependencies.
  */
 
-import { default as program } from '../src';
+const { default: program } = require('..');
 
 function list(val) {
   return val.split(',').map(Number);
 }
 
-program
+program()
   .version('0.0.1')
   .option(
     '-t, --template-engine [engine]',

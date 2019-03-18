@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-import { default as program } from '../src';
+const { default: program } = require('..');
 
 let cmdValue;
 let envValue;
 
-program
+program()
   .version('0.0.1')
   .arguments('<cmd> [env]')
   .action(function(cmd, env) {

@@ -1,7 +1,7 @@
 import path from 'path';
 import { spawn, exec } from 'child_process';
 import Joker from '@amilajack/joker';
-import { default as program } from '../src';
+import program from '../src';
 // import mockProcess from 'jest-mock-process';
 
 process.env.DARK_ENV = 'test';
@@ -46,7 +46,7 @@ describe('command', () => {
       })
       .parse(['node', 'test', 'mycommand', '--cheese', '']);
 
-    expect(prog.get('cheese')).toEqual('adfs');
+    expect(prog.get('cheese')).toEqual('');
     expect(val).toEqual('');
   });
 

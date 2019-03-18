@@ -4,9 +4,9 @@
  * Module dependencies.
  */
 
-import { default as program } from '../src';
+const { default: program } = require('..');
 
-program
+program()
   .version('0.0.1')
   .description('An application for pizzas ordering')
   .option('-p, --peppers', 'Add peppers')

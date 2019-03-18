@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-import { default as program } from '../src';
+const { default: program } = require('..');
 
 function range(val) {
   return val.split('..').map(Number);
@@ -23,7 +23,7 @@ function increaseVerbosity(v, total) {
   return total + 1;
 }
 
-program
+program()
   .version('0.0.1')
   .usage('test')
   .option('-i, --integer <n>', 'An integer argument', parseInt)

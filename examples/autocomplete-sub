@@ -10,7 +10,7 @@
 
 const { default: program } = require('..');
 
-program
+program()
   .command('sub1 <arg1> <arg2>')
   .description('sub command 1')
   .option('--verbose', 'verbose')
@@ -31,7 +31,7 @@ program
     }
   });
 
-program
+program()
   .command('sub2 <arg1>')
   .description('sub command 2')
   .option('--verbose', 'verbose')
