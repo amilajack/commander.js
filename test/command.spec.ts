@@ -531,7 +531,7 @@ describe('command', () => {
     await new Joker()
       .base(bin)
       .run('help')
-      .expect(({ stdout, stderr }) => {
+      .expect(({ stdout, stderr }: { stdout: string, stderr: string }) => {
         expect(stdout).toContain('install|i');
         expect(stdout).toContain('search|s');
         expect(stdout).toContain('cache|c');

@@ -37,10 +37,10 @@ const program = dark()
   .parse(process.argv);
 
 console.log('you ordered a pizza with:');
-if (program.peppers) console.log('  - peppers');
-if (program.pineapple) console.log('  - pineapple');
-if (program.bbqSauce) console.log('  - bbq');
-console.log('  - %s cheese', program.cheese);
+if (program.get('peppers')) console.log('  - peppers');
+if (program.get('pineapple')) console.log('  - pineapple');
+if (program.get('bbqSauce')) console.log('  - bbq');
+console.log('  - %s cheese', program.get('cheese'));
 ```
 
 2. Run it!:

@@ -12,8 +12,14 @@ export interface AutocompleteEvent {
 
 export type Args = (string | boolean)[];
 
+export interface CompletionArgs {
+  filename: string[];
+  args: string[];
+  url: string[];
+}
+
 export interface CompletionRules {
-  args: Args;
+  args: CompletionArgs | Args;
   options: {
     [x: string]: string;
   };
@@ -142,6 +148,7 @@ function autocompleteActiveArg(
 
 /**
  * A command builder
+ * @noInheritDoc
  */
 export class Command extends EventEmitter {
   public commands: Command[] = [];
@@ -152,7 +159,7 @@ export class Command extends EventEmitter {
 
   public defaultExecutable: string;
 
-  public parent: Command;
+  private parent: Command;
 
   public args: string[];
 
@@ -190,7 +197,7 @@ export class Command extends EventEmitter {
     args: []
   };
 
-  private constructor(name: string = '') {
+  public constructor(name: string = '') {
     super();
     this._name = name;
   }
@@ -533,8 +540,8 @@ export class Command extends EventEmitter {
    * @param arg - if `false`, error will be thrown if unknown option passed. Defaults to `false`
    * for unknown options.
    */
-  public allowUnknownOption(arg?: boolean): Command {
-    this._allowUnknownOption = arg ? arg : true;
+  public allowUnknownOption(arg: boolean = false): Command {
+    this._allowUnknownOption = arg;
     return this;
   }
 
@@ -573,7 +580,7 @@ export class Command extends EventEmitter {
    *
    * @returns if any complete rules has been defined for current command or its subcommands.
    */
-  public hasCompletionRules(): boolean {
+  private hasCompletionRules(): boolean {
     function isEmptyRule({
       options,
       args
@@ -777,7 +784,7 @@ export class Command extends EventEmitter {
    * @param argv
    * @returns [[Command]] for chaining
    */
-  public parse(argv: (string | boolean)[]): Command {
+  public parse(argv: Args): Command {
     // trigger autocomplete first if some completion rules have been defined
     if (this.hasCompletionRules()) {
       this.autocomplete(argv);
@@ -800,7 +807,7 @@ export class Command extends EventEmitter {
 
     // process argv
     const parsed = this.parseOptions(this.normalize(argv.slice(2)));
-    const args = this.args = parsed.args;
+    const args = (this.args = parsed.args);
 
     const result = this.parseArgs(this.args, parsed.unknown);
 
@@ -951,7 +958,7 @@ export class Command extends EventEmitter {
    * @param args
    * @returns array of normalized `args`
    */
-  private normalize(args: (string | boolean)[]): (string | boolean)[] {
+  private normalize(args: Args): Args {
     let ret = [];
     let arg;
     let lastOpt;
@@ -1042,7 +1049,7 @@ export class Command extends EventEmitter {
    * @param argv
    * @returns {Array}
    */
-  private parseOptions(argv: string[]): { args: string[]; unknown: string[] } {
+  private parseOptions(argv: Args): { args: Args; unknown: string[] } {
     const args = [];
     const len = argv.length;
     let literal;
@@ -1126,6 +1133,7 @@ export class Command extends EventEmitter {
       const key = this.options[i].attributeName();
       result[key] = key === this.versionOptionName ? this._version : this[key];
     }
+
     return result;
   }
 
@@ -1246,7 +1254,7 @@ export class Command extends EventEmitter {
    * @param alias - what to alias the command to
    * @returns the alias
    */
-  public getAlias(): string {
+  private getAlias(): string {
     let command: Command = this;
     if (this.commands.length !== 0) {
       command = this.commands[this.commands.length - 1];
@@ -1265,7 +1273,7 @@ export class Command extends EventEmitter {
     return this;
   }
 
-  public getUsage() {
+  private getUsage() {
     const args = this._args.map(arg => humanReadableArgName(arg));
 
     const usage = `[options]${this.commands.length ? ' [command]' : ''}${
@@ -1292,7 +1300,7 @@ export class Command extends EventEmitter {
    * @param str
    * @returns the name of the command
    */
-  public getName(): string {
+  private getName(): string {
     return this._name || '';
   }
 
@@ -1432,7 +1440,7 @@ export class Command extends EventEmitter {
    *
    * @returns program help documentation
    */
-  public helpInformation(): string {
+  private helpInformation(): string {
     let desc: string[] = [];
     if (this._description) {
       desc = [this._description, ''];
