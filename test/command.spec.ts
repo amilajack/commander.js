@@ -11,7 +11,6 @@ const sinon = {};
 jest.setTimeout(10000);
 
 describe('command', () => {
-
   beforeEach(() => {
     // jest.spyOn(process, 'exit').mockImplementation(() => {});
     // jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -209,10 +208,7 @@ describe('command', () => {
       'file2.c'
     ]);
 
-    expect(prog.autocompleteCandidates(['-o'])).toEqual([
-      'file1',
-      'file2'
-    ]);
+    expect(prog.autocompleteCandidates(['-o'])).toEqual(['file1', 'file2']);
 
     expect(prog.autocompleteCandidates(['--output'])).toEqual([
       'file1',
@@ -403,7 +399,7 @@ describe('command', () => {
       .end();
   });
 
-  test('executable subcommand signals hup', (done) => {
+  test('executable subcommand signals hup', done => {
     const bin = path.join(__dirname, 'fixtures/pm');
     const proc = spawn(bin, ['listen'], {});
 
@@ -424,7 +420,7 @@ describe('command', () => {
     }, 2000);
   });
 
-  test('executable subcommand signals int', (done) => {
+  test('executable subcommand signals int', done => {
     const bin = path.join(__dirname, 'fixtures/pm');
     const proc = spawn(bin, ['listen'], {});
 
@@ -440,12 +436,12 @@ describe('command', () => {
       // Set another timeout to give 'prog' time to handle the signal
       setTimeout(() => {
         expect(output).toEqual('SIGINT\n');
-        done()
+        done();
       }, 1000);
     }, 2000);
   });
 
-  test('term', (done) => {
+  test('term', done => {
     const bin = path.join(__dirname, 'fixtures/pm');
     const proc = spawn(bin, ['listen'], {});
 
@@ -466,7 +462,7 @@ describe('command', () => {
     }, 2000);
   });
 
-  test('usr1', (done) => {
+  test('usr1', done => {
     const bin = path.join(__dirname, 'fixtures/pm');
     const proc = spawn(bin, ['listen'], {});
 
@@ -498,7 +494,7 @@ describe('command', () => {
     }, 2000);
   });
 
-  test('usr2', (done) => {
+  test('usr2', done => {
     const bin = path.join(__dirname, 'fixtures/pm');
     const proc = spawn(bin, ['listen'], {});
 
@@ -519,7 +515,7 @@ describe('command', () => {
     }, 2000);
   });
 
-  test('tsnode', (done) => {
+  test('tsnode', done => {
     const bin = path.join(__dirname, 'fixtures-ts/pm.ts');
     exec(
       `${process.argv[0]} -r ts-node/register ${bin} install`,
@@ -636,10 +632,10 @@ describe('command', () => {
         expect(stdout).toEqual('cache-validate');
         expect(stderr).toEqual('');
       })
-      .end()
+      .end();
   });
 
-  test('executableSubcommandUnknown', (done) => {
+  test('executableSubcommandUnknown', done => {
     const bin = path.join(__dirname, 'fixtures/cmd');
 
     exec(`${bin} foo`, (error, stdout, stderr) => {
@@ -653,7 +649,7 @@ describe('command', () => {
     });
   });
 
-  test('failOnSameAlias', (done) => {
+  test('failOnSameAlias', done => {
     const bin = path.join(__dirname, 'fixtures/cmd');
 
     exec(`${bin} foo`, (error, stdout, stderr) => {
@@ -680,7 +676,9 @@ describe('command', () => {
   });
 
   test('helpInformation', () => {
-    const prog = program().command('somecommand').command('anothercommand [options]');
+    const prog = program()
+      .command('somecommand')
+      .command('anothercommand [options]');
     expect(prog.commands).toHaveLength(2);
 
     const expectedHelpInformation = [
@@ -777,7 +775,7 @@ describe('command', () => {
         noHelp: true
       });
 
-     prog = prog.parse(['node', 'test']);
+    prog = prog.parse(['node', 'test']);
 
     expect(prog.name).toBeInstanceOf(Function);
     expect(prog.name()).toEqual('test');
@@ -789,9 +787,7 @@ describe('command', () => {
     expect(prog.commands[2].noHelp).toBe(true);
     expect(prog.commands[3].name()).toEqual('hideagain');
     expect(prog.commands[3].noHelp).toBe(true);
-    expect(prog.commands[4].name()).toEqual(
-      'hiddencommandwithoutdescription'
-    );
+    expect(prog.commands[4].name()).toEqual('hiddencommandwithoutdescription');
     expect(prog.commands[4].noHelp).toBe(true);
     expect(prog.commands[5].name()).toEqual('help');
 

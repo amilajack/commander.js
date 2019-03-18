@@ -67,7 +67,7 @@ export default class Option {
    * Check if `arg` matches the short or long flag. Internally used to check
    * if an arg belongs to an [[Option]]
    */
-  is(arg: string): boolean {
+  public is(arg: string): boolean {
     return this.short === arg || this.long === arg;
   }
 

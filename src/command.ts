@@ -141,10 +141,8 @@ function autocompleteActiveArg(
 }
 
 /**
- * Initialize a new [[Command]].
- * @public
+ * A command builder
  */
-
 export class Command extends EventEmitter {
   public commands: Command[] = [];
 
@@ -192,7 +190,7 @@ export class Command extends EventEmitter {
     args: []
   };
 
-  constructor(name: string = '') {
+  private constructor(name: string = '') {
     super();
     this._name = name;
   }
@@ -200,7 +198,7 @@ export class Command extends EventEmitter {
   /**
    * Add command `name`.
    *
-   * The `.action()` callback is invoked when the
+   * The [[action]] callback is invoked when the
    * command `name` is specified via __ARGV__,
    * and the remaining arguments are applied to the
    * function for access.
@@ -353,7 +351,7 @@ export class Command extends EventEmitter {
    *      // output help here
    *   });
    * ```
-   * @param {Function} fn
+   * @param fn
    * @returns [[Command]] for chaining
    */
   public action(fn: Function): Command {
@@ -411,9 +409,9 @@ export class Command extends EventEmitter {
    * separated by comma, a pipe or space. The following are all valid
    * all will output this way when `--help` is used.
    *
-   *    "-p, --pepper"
-   *    "-p|--pepper"
-   *    "-p --pepper"
+   * * "-p, --pepper"
+   * * "-p|--pepper"
+   * * "-p --pepper"
    *
    * Examples:
    * ```ts
@@ -447,8 +445,8 @@ export class Command extends EventEmitter {
    *
    * @param flags
    * @param description
-   * @param {Function|*} [fn] or default
-   * @param {*} [defaultValue]
+   * @param fn
+   * @param defaultValue
    * @returns [[Command]] for chaining
    */
   public option(
@@ -532,7 +530,7 @@ export class Command extends EventEmitter {
   /**
    * Allow unknown options on the command line.
    *
-   * @param {Boolean} arg if `true` or omitted, no error will be thrown
+   * @param arg - if `false`, error will be thrown if unknown option passed. Defaults to `false`
    * for unknown options.
    */
   public allowUnknownOption(arg?: boolean): Command {
@@ -543,14 +541,14 @@ export class Command extends EventEmitter {
   /**
    * Define completionRules which will later be used by autocomplete to generate appropriate response
    *
-   * @param completion rules
+   * @param completion - rules
    */
   public complete(rules: {
     options: {};
     arguments: {
-      filename: string[],
-      args: string[],
-      url: string[]
+      filename: string[];
+      args: string[];
+      url: string[];
     };
     args: string[];
   }): Command {
@@ -573,7 +571,7 @@ export class Command extends EventEmitter {
   /**
    * Test if any complete rules has been defined for current command or its subcommands.
    *
-   * @returns {Boolean}
+   * @returns if any complete rules has been defined for current command or its subcommands.
    */
   public hasCompletionRules(): boolean {
     function isEmptyRule({
@@ -599,6 +597,8 @@ export class Command extends EventEmitter {
   /**
    * Handle autocomplete if command args starts with special options.
    * It will exit current process after successful processing.
+   *
+   * @returns [[Command]] from chaining
    */
   public autocomplete(argv: string[]): Command {
     const RESERVED_STARTING_KEYWORDS = [
@@ -612,6 +612,7 @@ export class Command extends EventEmitter {
 
     if (RESERVED_STARTING_KEYWORDS.includes(firstArg)) {
       // lazy require
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const omelette = require('omelette');
       const executableName = path.basename(argv[1], '.js');
       const completion = omelette(executableName);
@@ -847,11 +848,7 @@ export class Command extends EventEmitter {
    * @param args
    * @param unknown
    */
-  private executeSubCommand(
-    argv: string[],
-    args: string[],
-    unknown: any[]
-  ) {
+  private executeSubCommand(argv: string[], args: string[], unknown: any[]) {
     args = args.concat(unknown);
 
     if (!args.length) this.help();
@@ -1032,7 +1029,7 @@ export class Command extends EventEmitter {
    * Get an [[Option]] matching `arg` if any.
    *
    * @param arg
-   * @returns {Option}
+   * @returns an [[Option]] matching `arg` if any.
    */
   private optionFor(arg: string): Option | undefined {
     const option = this.options.find(option => option.is(arg));
@@ -1040,8 +1037,7 @@ export class Command extends EventEmitter {
   }
 
   /**
-   * Parse options from `argv` returning `argv`
-   * void of these options.
+   * Parse options from `argv` returning `argv` void of these options.
    *
    * @param argv
    * @returns {Array}
@@ -1207,11 +1203,11 @@ export class Command extends EventEmitter {
   }
 
   /**
-   * Set the description to `str`.
+   * Set the command description
    *
-   * @param str
+   * @param str - the description for the command
    * @param argsDescription
-   * @returns {String|Command}
+   * @returns [[Command]] for chaining
    */
   public description(
     str: string,
@@ -1225,8 +1221,8 @@ export class Command extends EventEmitter {
   /**
    * Set an alias for the command
    *
-   * @param alias
-   * @returns {String|Command}
+   * @param alias - what to alias the command to
+   * @returns [[Command]] for chaining
    */
   public alias(alias?: string): string | Command {
     let command: Command = this;
@@ -1252,7 +1248,7 @@ export class Command extends EventEmitter {
    * @param str
    * @returns this for chaining
    */
-  usage(str?: string): string | Command {
+  public usage(str?: string): string | Command {
     const args = this._args.map(arg => humanReadableArgName(arg));
 
     const usage = `[options]${this.commands.length ? ' [command]' : ''}${
@@ -1273,7 +1269,7 @@ export class Command extends EventEmitter {
    * @param str
    * @returns this for chaining
    */
-  name(str?: string): Command {
+  public name(str?: string): Command {
     this._name = str;
     return this;
   }
@@ -1283,7 +1279,7 @@ export class Command extends EventEmitter {
    *
    * @returns prepared commands
    */
-  prepareCommands(): string[][] {
+  private prepareCommands(): string[][] {
     return this.commands
       .filter(({ noHelp }) => !noHelp)
       .map(cmd => {
@@ -1302,7 +1298,7 @@ export class Command extends EventEmitter {
   /**
    * Get the largest command length.
    *
-   * @returns {Number}
+   * @returns the largest command length
    */
   private largestCommandLength() {
     const commands = this.prepareCommands();
@@ -1315,7 +1311,7 @@ export class Command extends EventEmitter {
   /**
    * Get the largest option length.
    *
-   * @returns {Number}
+   * @returns the largest option length
    */
   private largestOptionLength(): number {
     const options = [].slice.call(this.options);
@@ -1332,7 +1328,7 @@ export class Command extends EventEmitter {
   /**
    * Get the largest arg length.
    *
-   * @returns {Number}
+   * @returns the largest arg length
    */
   private largestArgLength(): number {
     return this._args.reduce(
@@ -1344,7 +1340,7 @@ export class Command extends EventEmitter {
   /**
    * Get the pad width.
    *
-   * @returns {Number}
+   * @returns the pad width
    */
   private padWidth(): number {
     let width = this.largestOptionLength();
@@ -1366,7 +1362,7 @@ export class Command extends EventEmitter {
   /**
    * Get help for options.
    *
-   * @returns
+   * @returns help options as a string
    */
   private optionHelp(): string {
     const width = this.padWidth();
@@ -1412,7 +1408,7 @@ export class Command extends EventEmitter {
   /**
    * Get program help documentation.
    *
-   * @returns
+   * @returns program help documentation
    */
   public helpInformation(): string {
     let desc: string[] = [];

@@ -80,9 +80,9 @@ describe('options', () => {
   test('required', () => {
     const util = require('util');
 
-    const info = [];
+    const info: string[] = [];
 
-    console.error = function(...args) {
+    console.error = (...args: string[]) => {
       info.push(util.format.apply(util, args));
     };
 
@@ -234,12 +234,14 @@ describe('options', () => {
       .description('run setup commands for all envs')
       .option('-s, --setup_mode [mode]', 'Which setup mode to use')
       .option('-o, --host [host]', 'Host to use')
-      .action((env, { setup_mode }) => {
-        const mode = setup_mode || 'normal';
-        env = env || 'all';
+      .action(
+        (env: string, { setup_mode: setupMode }: { setup_mode: string }) => {
+          const mode = setupMode || 'normal';
+          env = env || 'all';
 
-        envValue = env;
-      });
+          envValue = env;
+        }
+      );
 
     prog
       .command('exec <cmd>')

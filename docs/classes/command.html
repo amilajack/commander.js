@@ -910,9 +910,6 @@ img { max-width: 100%; }
 		<li class="current tsd-kind-class">
 			<a href="command.html" class="tsd-kind-icon">Command</a>
 			<ul>
-				<li class=" tsd-kind-constructor tsd-parent-kind-class">
-					<a href="command.html#constructor" class="tsd-kind-icon">constructor</a>
-				</li>
 				<li class=" tsd-kind-property tsd-parent-kind-class">
 					<a href="command.html#args" class="tsd-kind-icon">args</a>
 				</li>
@@ -1021,9 +1018,6 @@ img { max-width: 100%; }
 				<li class=" tsd-kind-method tsd-parent-kind-class">
 					<a href="command.html#parseexpectedargs" class="tsd-kind-icon">parse<wbr>Expected<wbr>Args</a>
 				</li>
-				<li class=" tsd-kind-method tsd-parent-kind-class">
-					<a href="command.html#preparecommands" class="tsd-kind-icon">prepare<wbr>Commands</a>
-				</li>
 				<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited">
 					<a href="command.html#prependlistener" class="tsd-kind-icon">prepend<wbr>Listener</a>
 				</li>
@@ -1075,7 +1069,7 @@ img { max-width: 100%; }
 		<section class="tsd-panel tsd-comment">
 			<div class="tsd-comment tsd-typography">
 				<div class="lead">
-					<p>Initialize a new <a href="command.html">Command</a>.</p>
+					<p>A command builder</p>
 				</div>
 			</div>
 		</section>
@@ -1096,12 +1090,6 @@ img { max-width: 100%; }
 			<h2>Index</h2>
 			<section class="tsd-panel tsd-index-panel">
 				<div class="tsd-index-content">
-					<section class="tsd-index-section ">
-						<h3>Constructors</h3>
-						<ul class="tsd-index-list">
-							<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="command.html#constructor" class="tsd-kind-icon">constructor</a></li>
-						</ul>
-					</section>
 					<section class="tsd-index-section ">
 						<h3>Properties</h3>
 						<ul class="tsd-index-list">
@@ -1146,7 +1134,6 @@ img { max-width: 100%; }
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="command.html#outputhelp" class="tsd-kind-icon">output<wbr>Help</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="command.html#parse" class="tsd-kind-icon">parse</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class"><a href="command.html#parseexpectedargs" class="tsd-kind-icon">parse<wbr>Expected<wbr>Args</a></li>
-							<li class="tsd-kind-method tsd-parent-kind-class"><a href="command.html#preparecommands" class="tsd-kind-icon">prepare<wbr>Commands</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited"><a href="command.html#prependlistener" class="tsd-kind-icon">prepend<wbr>Listener</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited"><a href="command.html#prependoncelistener" class="tsd-kind-icon">prepend<wbr>Once<wbr>Listener</a></li>
 							<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-inherited"><a href="command.html#rawlisteners" class="tsd-kind-icon">raw<wbr>Listeners</a></li>
@@ -1162,32 +1149,6 @@ img { max-width: 100%; }
 			</section>
 		</section>
 		<section class="tsd-panel-group tsd-member-group ">
-			<h2>Constructors</h2>
-			<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class">
-				<a name="constructor" class="tsd-anchor"></a>
-				<h3>constructor</h3>
-				<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-					<li class="tsd-signature tsd-kind-icon">new <wbr>Command<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="command.html" class="tsd-signature-type">Command</a></li>
-				</ul>
-				<ul class="tsd-descriptions">
-					<li class="tsd-description">
-						<aside class="tsd-sources">
-							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L193">command.ts:193</a></li>
-							</ul>
-						</aside>
-						<h4 class="tsd-parameters-title">Parameters</h4>
-						<ul class="tsd-parameters">
-							<li>
-								<h5><span class="tsd-flag ts-flagDefault value">Default value</span> name: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;&quot;</span></h5>
-							</li>
-						</ul>
-						<h4 class="tsd-returns-title">Returns <a href="command.html" class="tsd-signature-type">Command</a></h4>
-					</li>
-				</ul>
-			</section>
-		</section>
-		<section class="tsd-panel-group tsd-member-group ">
 			<h2>Properties</h2>
 			<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 				<a name="args" class="tsd-anchor"></a>
@@ -1195,7 +1156,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">args<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L159">command.ts:159</a></li>
+						<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L157">command.ts:157</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1205,7 +1166,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">commands<span class="tsd-signature-symbol">:</span> <a href="command.html" class="tsd-signature-type">Command</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[]</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L149">command.ts:149</a></li>
+						<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L147">command.ts:147</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1215,7 +1176,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">default<wbr>Executable<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L155">command.ts:155</a></li>
+						<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L153">command.ts:153</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1225,7 +1186,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">executables<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L153">command.ts:153</a></li>
+						<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L151">command.ts:151</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1235,7 +1196,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">options<span class="tsd-signature-symbol">:</span> <a href="option.html" class="tsd-signature-type">Option</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[]</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L151">command.ts:151</a></li>
+						<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L149">command.ts:149</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1245,7 +1206,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">parent<span class="tsd-signature-symbol">:</span> <a href="command.html" class="tsd-signature-type">Command</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L157">command.ts:157</a></li>
+						<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L155">command.ts:155</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1255,7 +1216,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">raw<wbr>Args<span class="tsd-signature-symbol">:</span> <a href="../index.html#args" class="tsd-signature-type">Args</a></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L166">command.ts:166</a></li>
+						<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L164">command.ts:164</a></li>
 					</ul>
 				</aside>
 			</section>
@@ -1265,7 +1226,7 @@ img { max-width: 100%; }
 				<div class="tsd-signature tsd-kind-icon">running<wbr>Command<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ChildProcess</span></div>
 				<aside class="tsd-sources">
 					<ul>
-						<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L164">command.ts:164</a></li>
+						<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L162">command.ts:162</a></li>
 					</ul>
 				</aside>
 				<div class="tsd-comment tsd-typography">
@@ -1298,20 +1259,20 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L359">command.ts:359</a></li>
+								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L357">command.ts:357</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
 							<div class="lead">
-								<p>Register callback <code>fn</code> for the command.</p>
+								<p>Register callback [[fn]] for the command.</p>
 							</div>
 							<p>Examples:</p>
-							<pre><code class="language-ts">     program
-       .command(<span class="hljs-string">'help'</span>)
-       .description(<span class="hljs-string">'display verbose help'</span>)
-       .action(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
-          <span class="hljs-comment">// output help here</span>
-       });</code></pre>
+							<pre><code class="language-ts">program()
+  .command(<span class="hljs-string">'help'</span>)
+  .description(<span class="hljs-string">'display verbose help'</span>)
+  .action(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+     <span class="hljs-comment">// output help here</span>
+  });</code></pre>
 						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
@@ -1320,7 +1281,7 @@ img { max-width: 100%; }
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="command.html" class="tsd-signature-type">Command</a></h4>
-						<p>for chaining</p>
+						<p><a href="command.html">Command</a> for chaining</p>
 					</li>
 				</ul>
 			</section>
@@ -1380,7 +1341,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L1230">command.ts:1230</a></li>
+								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L1227">command.ts:1227</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1392,12 +1353,16 @@ img { max-width: 100%; }
 						<ul class="tsd-parameters">
 							<li>
 								<h5><span class="tsd-flag ts-flagOptional">Optional</span> alias: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>what to alias the command to</p>
+								</div>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span>
 							<span class="tsd-signature-symbol"> | </span>
 							<a href="command.html" class="tsd-signature-type">Command</a>
 						</h4>
+						<p><a href="command.html">Command</a> for chaining</p>
 					</li>
 				</ul>
 			</section>
@@ -1411,7 +1376,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L537">command.ts:537</a></li>
+								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L536">command.ts:536</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1424,7 +1389,7 @@ img { max-width: 100%; }
 							<li>
 								<h5><span class="tsd-flag ts-flagOptional">Optional</span> arg: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></h5>
 								<div class="tsd-comment tsd-typography">
-									<p>if <code>true</code> or omitted, no error will be thrown
+									<p>if <code>false</code>, error will be thrown if unknown option passed. Defaults to <code>false</code>
 									for unknown options.</p>
 								</div>
 							</li>
@@ -1443,7 +1408,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L296">command.ts:296</a></li>
+								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L294">command.ts:294</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1471,7 +1436,7 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L602">command.ts:602</a></li>
+								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L603">command.ts:603</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1487,6 +1452,7 @@ img { max-width: 100%; }
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="command.html" class="tsd-signature-type">Command</a></h4>
+						<p><a href="command.html">Command</a> from chaining</p>
 					</li>
 				</ul>
 			</section>
@@ -1500,14 +1466,14 @@ img { max-width: 100%; }
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L260">command.ts:260</a></li>
+								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L258">command.ts:258</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
 							<div class="lead">
 								<p>Add command <code>name</code>.</p>
 							</div>
-							<p>The <code>.action()</code> callback is invoked when the
+							<p>The <a href="command.html#action">action</a> callback is invoked when the
 								command <code>name</code> is specified via <strong>ARGV</strong>,
 								and the remaining arguments are applied to the
 							function for access.</p>
@@ -1515,27 +1481,27 @@ img { max-width: 100%; }
 								will be passed as the first arg, followed by
 							the rest of <strong>ARGV</strong> remaining.</p>
 							<p>Examples:</p>
-							<pre><code class="language-ts">program
+							<pre><code class="language-ts"><span class="hljs-keyword">const</span> prog = program()
   .version(<span class="hljs-string">'0.0.1'</span>)
   .option(<span class="hljs-string">'-C, --chdir &lt;path&gt;'</span>, <span class="hljs-string">'change the working directory'</span>)
   .option(<span class="hljs-string">'-c, --config &lt;path&gt;'</span>, <span class="hljs-string">'set config path. defaults to ./deploy.conf'</span>)
   .option(<span class="hljs-string">'-T, --no-tests'</span>, <span class="hljs-string">'ignore test hook'</span>)
 
-program
+prog
   .command(<span class="hljs-string">'setup'</span>)
   .description(<span class="hljs-string">'run remote setup commands'</span>)
   .action(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
     <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'setup'</span>);
   });
 
-program
+prog
   .command(<span class="hljs-string">'exec &lt;cmd&gt;'</span>)
   .description(<span class="hljs-string">'run the given remote command'</span>)
   .action(<span class="hljs-function">(<span class="hljs-params">cmd</span>) =&gt;</span> {
     <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'exec "%s"'</span>, cmd);
   });
 
-program
+prog
   .command(<span class="hljs-string">'teardown &lt;dir&gt; [otherDirs...]'</span>)
   .description(<span class="hljs-string">'run teardown commands'</span>)
   .action(<span class="hljs-function">(<span class="hljs-params">dir, otherDirs</span>) =&gt;</span> {
@@ -1547,14 +1513,14 @@ program
     }
   });
 
-program
+prog
   .command(<span class="hljs-string">'*'</span>)
   .description(<span class="hljs-string">'deploy the given env'</span>)
   .action(<span class="hljs-function">(<span class="hljs-params">env</span>) =&gt;</span> {
     <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'deploying "%s"'</span>, env);
   });
 
-program.parse(process.argv);</code></pre>
+prog.parse(process.argv);</code></pre>
 						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
@@ -1571,7 +1537,7 @@ program.parse(process.argv);</code></pre>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="command.html" class="tsd-signature-type">Command</a></h4>
-						<p>the new command</p>
+						<p><a href="command.html">Command</a> the new command</p>
 					</li>
 				</ul>
 			</section>
@@ -1585,7 +1551,7 @@ program.parse(process.argv);</code></pre>
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L547">command.ts:547</a></li>
+								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L546">command.ts:546</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1615,24 +1581,28 @@ program.parse(process.argv);</code></pre>
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L1215">command.ts:1215</a></li>
+								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L1212">command.ts:1212</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
 							<div class="lead">
-								<p>Set the description to <code>str</code>.</p>
+								<p>Set the command description</p>
 							</div>
 						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
 							<li>
 								<h5>str: <span class="tsd-signature-type">string</span></h5>
+								<div class="tsd-comment tsd-typography">
+									<p>the description for the command</p>
+								</div>
 							</li>
 							<li>
 								<h5><span class="tsd-flag ts-flagOptional">Optional</span> argsDescription: <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h5>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="command.html" class="tsd-signature-type">Command</a></h4>
+						<p><a href="command.html">Command</a> for chaining</p>
 					</li>
 				</ul>
 			</section>
@@ -1693,7 +1663,7 @@ program.parse(process.argv);</code></pre>
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L524">command.ts:524</a></li>
+								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L523">command.ts:523</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1749,7 +1719,7 @@ program.parse(process.argv);</code></pre>
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L577">command.ts:577</a></li>
+								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L576">command.ts:576</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1758,6 +1728,7 @@ program.parse(process.argv);</code></pre>
 							</div>
 						</div>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						<p>if any complete rules has been defined for current command or its subcommands.</p>
 					</li>
 				</ul>
 			</section>
@@ -1771,7 +1742,7 @@ program.parse(process.argv);</code></pre>
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L1470">command.ts:1470</a></li>
+								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L1467">command.ts:1467</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1799,15 +1770,16 @@ program.parse(process.argv);</code></pre>
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L1416">command.ts:1416</a></li>
+								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L1413">command.ts:1413</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
 							<div class="lead">
-								<p>Return program help documentation.</p>
+								<p>Get program help documentation.</p>
 							</div>
 						</div>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						<p>program help documentation</p>
 					</li>
 				</ul>
 			</section>
@@ -1871,7 +1843,7 @@ program.parse(process.argv);</code></pre>
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L1275">command.ts:1275</a></li>
+								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L1272">command.ts:1272</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -1886,6 +1858,7 @@ program.parse(process.argv);</code></pre>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="command.html" class="tsd-signature-type">Command</a></h4>
+						<p>this for chaining</p>
 					</li>
 				</ul>
 			</section>
@@ -2037,7 +2010,7 @@ program.parse(process.argv);</code></pre>
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L453">command.ts:453</a></li>
+								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L452">command.ts:452</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2048,40 +2021,38 @@ program.parse(process.argv);</code></pre>
 							<p>The <code>flags</code> string should contain both the short and long flags,
 								separated by comma, a pipe or space. The following are all valid
 							all will output this way when <code>--help</code> is used.</p>
-							<p>   &quot;-p, --pepper&quot;
-								&quot;-p|--pepper&quot;
-							&quot;-p --pepper&quot;</p>
-							<p>Examples:
-								<code>`</code>ts
-								// simple boolean defaulting to false
-							program.option(&#39;-p, --pepper&#39;, &#39;add pepper&#39;);</p>
-							<pre><code>--pepper
-<span class="hljs-keyword">program</span>.pepper
+							<ul>
+								<li>&quot;-p, --pepper&quot;</li>
+								<li>&quot;-p|--pepper&quot;</li>
+								<li>&quot;-p --pepper&quot;</li>
+							</ul>
+							<p>Examples:</p>
+							<pre><code class="language-ts"><span class="hljs-comment">// simple boolean defaulting to false</span>
+program.option(<span class="hljs-string">'-p, --pepper'</span>, <span class="hljs-string">'add pepper'</span>);
+
+<span class="hljs-comment">// --pepper</span>
+program.pepper
 <span class="hljs-comment">// =&gt; Boolean</span>
 
 <span class="hljs-comment">// simple boolean defaulting to true</span>
-<span class="hljs-keyword">program</span>.option(<span class="hljs-string">'-C, --no-cheese'</span>, <span class="hljs-string">'remove cheese'</span>);
+program.option(<span class="hljs-string">'-C, --no-cheese'</span>, <span class="hljs-string">'remove cheese'</span>);
 
-<span class="hljs-keyword">program</span>.cheese
+program.cheese
 <span class="hljs-comment">// =&gt; true</span>
 
---no-cheese
-<span class="hljs-keyword">program</span>.cheese
+<span class="hljs-comment">// --no-cheese</span>
+program.cheese
 <span class="hljs-comment">// =&gt; false</span>
 
 <span class="hljs-comment">// required argument</span>
-<span class="hljs-keyword">program</span>.option(<span class="hljs-string">'-C, --chdir &lt;path&gt;'</span>, <span class="hljs-string">'change the working directory'</span>);
+program.option(<span class="hljs-string">'-C, --chdir &lt;path&gt;'</span>, <span class="hljs-string">'change the working directory'</span>);
 
---chdir /tmp
-<span class="hljs-keyword">program</span>.chdir
+<span class="hljs-comment">// --chdir /tmp</span>
+program.chdir
 <span class="hljs-comment">// =&gt; "/tmp"</span>
 
 <span class="hljs-comment">// optional argument</span>
-<span class="hljs-keyword">program</span>.option(<span class="hljs-string">'-c, --cheese [type]'</span>, <span class="hljs-string">'add cheese [marble]'</span>);</code></pre><p>@param flags
-								@param description
-								@param {Function|<em>} [fn] or default
-								@param {</em>} [defaultValue]
-							@return {Command} for chaining</p>
+program.option(<span class="hljs-string">'-c, --cheese [type]'</span>, <span class="hljs-string">'add cheese [marble]'</span>);</code></pre>
 						</div>
 						<h4 class="tsd-parameters-title">Parameters</h4>
 						<ul class="tsd-parameters">
@@ -2099,6 +2070,7 @@ program.parse(process.argv);</code></pre>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="command.html" class="tsd-signature-type">Command</a></h4>
+						<p><a href="command.html">Command</a> for chaining</p>
 					</li>
 				</ul>
 			</section>
@@ -2112,15 +2084,16 @@ program.parse(process.argv);</code></pre>
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L1124">command.ts:1124</a></li>
+								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L1121">command.ts:1121</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
 							<div class="lead">
-								<p>Return an object containing options as key-value pairs</p>
+								<p>Get an object containing options as key-value pairs</p>
 							</div>
 						</div>
 						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						<p>an object containing options as key-value pairs</p>
 					</li>
 				</ul>
 			</section>
@@ -2134,7 +2107,7 @@ program.parse(process.argv);</code></pre>
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L1459">command.ts:1459</a></li>
+								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L1456">command.ts:1456</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2162,7 +2135,7 @@ program.parse(process.argv);</code></pre>
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L778">command.ts:778</a></li>
+								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L780">command.ts:780</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2177,7 +2150,7 @@ program.parse(process.argv);</code></pre>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="command.html" class="tsd-signature-type">Command</a></h4>
-						<p>for chaining</p>
+						<p><a href="command.html">Command</a> for chaining</p>
 					</li>
 				</ul>
 			</section>
@@ -2191,7 +2164,7 @@ program.parse(process.argv);</code></pre>
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L313">command.ts:313</a></li>
+								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L311">command.ts:311</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2207,28 +2180,6 @@ program.parse(process.argv);</code></pre>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="command.html" class="tsd-signature-type">Command</a></h4>
-					</li>
-				</ul>
-			</section>
-			<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-				<a name="preparecommands" class="tsd-anchor"></a>
-				<h3>prepare<wbr>Commands</h3>
-				<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-					<li class="tsd-signature tsd-kind-icon">prepare<wbr>Commands<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">[]</span></li>
-				</ul>
-				<ul class="tsd-descriptions">
-					<li class="tsd-description">
-						<aside class="tsd-sources">
-							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L1285">command.ts:1285</a></li>
-							</ul>
-						</aside>
-						<div class="tsd-comment tsd-typography">
-							<div class="lead">
-								<p>Return prepared commands.</p>
-							</div>
-						</div>
-						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">[]</span></h4>
 					</li>
 				</ul>
 			</section>
@@ -2455,7 +2406,7 @@ program.parse(process.argv);</code></pre>
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L1254">command.ts:1254</a></li>
+								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L1251">command.ts:1251</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2473,6 +2424,7 @@ program.parse(process.argv);</code></pre>
 							<span class="tsd-signature-symbol"> | </span>
 							<a href="command.html" class="tsd-signature-type">Command</a>
 						</h4>
+						<p>this for chaining</p>
 					</li>
 				</ul>
 			</section>
@@ -2486,7 +2438,7 @@ program.parse(process.argv);</code></pre>
 					<li class="tsd-description">
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/4f96610/src/command.ts#L1195">command.ts:1195</a></li>
+								<li>Defined in <a href="https://github.com/amilajack/commander.js/blob/e7c9259/src/command.ts#L1192">command.ts:1192</a></li>
 							</ul>
 						</aside>
 						<div class="tsd-comment tsd-typography">
@@ -2506,7 +2458,7 @@ program.parse(process.argv);</code></pre>
 							</li>
 						</ul>
 						<h4 class="tsd-returns-title">Returns <a href="command.html" class="tsd-signature-type">Command</a></h4>
-						<p>for chaining</p>
+						<p><a href="command.html">Command</a> for chaining</p>
 					</li>
 				</ul>
 			</section>

@@ -7,6 +7,8 @@
 
 ## Goals
 
+Dark is a fork of [commander.js](https://github.com/tj/commander.js/) with the following goals:
+
 * **Customizability**: Users can override the built in templates (.i.e default help prompt template) by importing templates
 * **Type Safe**: Improved compatibility with type systems
 * **Improved Documentation**: Provide a plethora of examples along with high quality API docs
