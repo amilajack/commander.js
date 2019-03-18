@@ -361,7 +361,7 @@ describe('options', () => {
     expect(prog.commands[1].target).toEqual('target1');
     expect(cmdValue).toEqual('exec3');
 
-    delete program.commands[1].target;
+    delete prog.commands[1].target;
     prog = prog.parse([
       'node',
       'test',

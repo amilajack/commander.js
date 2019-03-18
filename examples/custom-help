@@ -6,7 +6,7 @@
 
 const { default: program } = require('..');
 
-program()
+const prog = program()
   .version('0.0.1')
   .option('-f, --foo', 'enable some foo')
   .option('-b, --bar', 'enable some bar')
@@ -15,7 +15,7 @@ program()
 // must be before .parse() since
 // node's emit() is immediate
 
-program.on('--help', function() {
+prog.on('--help', function() {
   console.log('');
   console.log('Examples:');
   console.log('');
@@ -23,6 +23,6 @@ program.on('--help', function() {
   console.log('  $ custom-help -h');
 });
 
-program.parse(process.argv);
+prog.parse(process.argv);
 
-program.help();
+prog.help();

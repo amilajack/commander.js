@@ -6,7 +6,7 @@
 
 const { default: program } = require('..');
 
-program()
+const prog = program()
   .version('0.0.1')
   .option('-s, --sessions', 'add session support')
   .option(
@@ -21,6 +21,6 @@ program()
   )
   .parse(process.argv);
 
-console.log(' - sessions %j', program.sessions);
-console.log(' - template %j', program.template);
-console.log(' - css %j', program.css);
+console.log(' - sessions %j', prog.sessions);
+console.log(' - template %j', prog.template);
+console.log(' - css %j', prog.css);

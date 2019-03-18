@@ -385,13 +385,13 @@ describe('command', () => {
     ]);
   });
 
-  test.concurrent('executableSubcommand', async () => {
+  test('executableSubcommand', async () => {
     const bin = path.join(__dirname, 'fixtures/pm');
     await new Joker()
       .base(bin)
       .run('list')
       .stdout('')
-      .stderr('\n  pm-list(1) does not exist, try --help\n\n')
+      .stderr('pm-list(1) does not exist, try --help\n\n')
       .run('install')
       .stdout('install')
       .run('publish')
@@ -526,12 +526,13 @@ describe('command', () => {
     );
   });
 
-  test.concurrent('executableSubcommandAlias help', async () => {
+  test('executableSubcommandAlias help', async () => {
     const bin = path.join(__dirname, 'fixtures/pm');
     await new Joker()
       .base(bin)
       .run('help')
       .expect(({ stdout, stderr }: { stdout: string, stderr: string }) => {
+        console.log(stdout)
         expect(stdout).toContain('install|i');
         expect(stdout).toContain('search|s');
         expect(stdout).toContain('cache|c');
@@ -543,7 +544,7 @@ describe('command', () => {
       .end();
   });
 
-  test.concurrent('executableSubcommandAlias alias', async () => {
+  test('executableSubcommandAlias alias', async () => {
     await new Joker()
       .base(path.join(__dirname, 'fixtures/pm'))
       .run('i')
@@ -558,7 +559,7 @@ describe('command', () => {
       .end();
   });
 
-  test.concurrent('executableSubcommandDefault', async () => {
+  test('executableSubcommandDefault', async () => {
     await new Joker()
       .base(path.join(__dirname, 'fixtures/pm'))
       .run('default')
@@ -612,7 +613,7 @@ describe('command', () => {
     // });
   });
 
-  test.concurrent('executableSubcommandSubcommand', async () => {
+  test('executableSubcommandSubcommand', async () => {
     await new Joker()
       .base(path.join(__dirname, 'fixtures/pm'))
       .run('cache help')

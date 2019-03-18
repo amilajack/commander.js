@@ -23,7 +23,7 @@ function increaseVerbosity(v, total) {
   return total + 1;
 }
 
-program()
+const prog = program()
   .version('0.0.1')
   .usage('test')
   .option('-i, --integer <n>', 'An integer argument', parseInt)
@@ -40,12 +40,12 @@ program()
   )
   .parse(process.argv);
 
-console.log(' int: %j', program.integer);
-console.log(' float: %j', program.float);
-console.log(' optional: %j', program.optional);
-program.range = program.range || [];
-console.log(' range: %j..%j', program.range[0], program.range[1]);
-console.log(' list: %j', program.list);
-console.log(' collect: %j', program.collect);
-console.log(' verbosity: %j', program.verbose);
-console.log(' args: %j', program.args);
+console.log(' int: %j', prog.integer);
+console.log(' float: %j', prog.float);
+console.log(' optional: %j', prog.optional);
+prog.range = prog.range || [];
+console.log(' range: %j..%j', prog.range[0], prog.range[1]);
+console.log(' list: %j', prog.list);
+console.log(' collect: %j', prog.collect);
+console.log(' verbosity: %j', prog.verbose);
+console.log(' args: %j', prog.args);

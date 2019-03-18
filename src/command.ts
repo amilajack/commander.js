@@ -46,8 +46,8 @@ function pad(str: string, width: number): string {
 /**
  * Output help information if necessary
  *
- * @param {Command} command to output help for
- * @param array of options to search for -h or --help
+ * @param command - the command to output help for
+ * @param options - an array of options to search for `-h` or `--help`
  */
 function outputHelpIfNecessary(cmd: Command, options: string[] = []) {
   for (let i = 0; i < options.length; i++) {
@@ -315,7 +315,7 @@ export class Command extends EventEmitter {
    *
    * For example `["[type]"]` becomes `[{ required: false, name: 'type' }]`.
    */
-  public parseExpectedArgs(args: string[]): Command {
+  private parseExpectedArgs(args: string[]): Command {
     if (!args.length) this;
 
     args.forEach(arg => {
@@ -546,7 +546,7 @@ export class Command extends EventEmitter {
   }
 
   /**
-   * Define completionRules which will later be used by autocomplete to generate appropriate response
+   * Define completion rules which will later be used by autocomplete to generate appropriate response
    *
    * @param completion - rules
    */
@@ -1268,12 +1268,15 @@ export class Command extends EventEmitter {
    * @param str
    * @returns [[Command]] for chaining
    */
-  public usage(str: string): string | Command {
-    this._usage = str;
+  public usage(usage: string): string | Command {
+    this._usage = usage;
     return this;
   }
 
-  private getUsage() {
+  /**
+   * Get the usage prompt as a string
+   */
+  private getUsage(): string {
     const args = this._args.map(arg => humanReadableArgName(arg));
 
     const usage = `[options]${this.commands.length ? ' [command]' : ''}${

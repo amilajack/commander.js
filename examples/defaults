@@ -10,7 +10,7 @@ function list(val) {
   return val.split(',').map(Number);
 }
 
-program()
+const prog = program()
   .version('0.0.1')
   .option(
     '-t, --template-engine [engine]',
@@ -30,6 +30,6 @@ program()
   )
   .parse(process.argv);
 
-console.log('  - %s template engine', program.templateEngine);
-console.log('  - %s cheese', program.cheese);
-console.log('  - %j', program.list);
+console.log('  - %s template engine', prog.templateEngine);
+console.log('  - %s cheese', prog.cheese);
+console.log('  - %j', prog.list);
