@@ -112,9 +112,9 @@ function autocompleteActiveOption(
  */
 function autocompleteActiveArg(
   optionRules: Record<string, any>,
-  argRules: string[],
+  argRules: Record<string, any>[],
   typedArgs: string[]
-): Record<string, any> {
+): Record<string, any> | boolean {
   if (argRules.length === 0) {
     return false;
   }
@@ -638,7 +638,7 @@ export class Command extends EventEmitter {
       // sub command style
       if (event.fragment === 1) {
         // for sub command first complete should return command
-        const commands = this.commands.map(c => c.name());
+        const commands = this.commands.map(c => c.getName());
 
         event.reply(commands.concat(['--help']));
       } else {
@@ -646,7 +646,7 @@ export class Command extends EventEmitter {
         const commandName = elements[1];
         const commandArgs = elements.slice(2, event.fragment);
         const currentCommand = this.commands.find(
-          c => c.name() === commandName
+          c => c.getName() === commandName
         );
 
         if (currentCommand) {
@@ -800,7 +800,7 @@ export class Command extends EventEmitter {
 
     // process argv
     const parsed = this.parseOptions(this.normalize(argv.slice(2)));
-    const args = (this.args = parsed.args);
+    const args = this.args = parsed.args;
 
     const result = this.parseArgs(this.args, parsed.unknown);
 
@@ -811,7 +811,7 @@ export class Command extends EventEmitter {
     // check alias of sub commands
     if (name) {
       aliasCommand = this.commands.filter(
-        command => command.alias() === name
+        command => command.getAlias() === name
       )[0];
     }
 
@@ -951,7 +951,7 @@ export class Command extends EventEmitter {
    * @param args
    * @returns array of normalized `args`
    */
-  private normalize(args: string[]): string[] {
+  private normalize(args: (string | boolean)[]): (string | boolean)[] {
     let ret = [];
     let arg;
     let lastOpt;
@@ -1224,13 +1224,11 @@ export class Command extends EventEmitter {
    * @param alias - what to alias the command to
    * @returns [[Command]] for chaining
    */
-  public alias(alias?: string): string | Command {
+  public alias(alias: string): Command {
     let command: Command = this;
     if (this.commands.length !== 0) {
       command = this.commands[this.commands.length - 1];
     }
-
-    if (arguments.length === 0) return command._alias;
 
     if (alias === command._name) {
       throw new Error("Command alias can't be the same as its name");
@@ -1243,35 +1241,59 @@ export class Command extends EventEmitter {
   }
 
   /**
-   * Set / get the command usage `str`.
+   * Get the alias for the command
+   *
+   * @param alias - what to alias the command to
+   * @returns the alias
+   */
+  public getAlias(): string {
+    let command: Command = this;
+    if (this.commands.length !== 0) {
+      command = this.commands[this.commands.length - 1];
+    }
+    return command._alias;
+  }
+
+  /**
+   * Set the command usage `str`.
    *
    * @param str
-   * @returns this for chaining
+   * @returns [[Command]] for chaining
    */
-  public usage(str?: string): string | Command {
+  public usage(str: string): string | Command {
+    this._usage = str;
+    return this;
+  }
+
+  public getUsage() {
     const args = this._args.map(arg => humanReadableArgName(arg));
 
     const usage = `[options]${this.commands.length ? ' [command]' : ''}${
       this._args.length ? ` ${args.join(' ')}` : ''
     }`;
 
-    if (arguments.length === 0) return this._usage || usage;
-    if (str) {
-      this._usage = str;
-    }
+    return this._usage || usage;
+  }
 
+  /**
+   * Set the name of the command
+   *
+   * @param str
+   * @returns [[Command]] for chaining
+   */
+  public name(str: string): Command {
+    this._name = str;
     return this;
   }
 
   /**
-   * Get or set the name of the command
+   * Get the name of the command
    *
    * @param str
-   * @returns this for chaining
+   * @returns the name of the command
    */
-  public name(str?: string): Command {
-    this._name = str;
-    return this;
+  public getName(): string {
+    return this._name || '';
   }
 
   /**
@@ -1431,7 +1453,7 @@ export class Command extends EventEmitter {
     if (this._alias) {
       cmdName = `${cmdName}|${this._alias}`;
     }
-    const usage = [`Usage: ${cmdName} ${this.usage()}`, ''];
+    const usage = [`Usage: ${cmdName} ${this.getUsage()}`, ''];
 
     let cmds: string[] = [];
     const commandHelp = this.commandHelp();
