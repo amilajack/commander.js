@@ -20,6 +20,7 @@
     "types": "yarn ts --declaration",
     "docs": "rm -rf docs && typedoc --out docs src --ignoreCompilerErrors",
     "lint": "eslint --ignore-path .gitignore --ignore-pattern '/docs/' --ext .ts --ext .js .",
+    "preversion": "yarn build",
     "spec": "jest",
     "test": "yarn tsc && yarn lint && yarn spec && yarn build && yarn doc",
     "ts": "tsc"
