@@ -22,10 +22,13 @@ npm install dark
 
 ## A Taste
 
-```js
-const dark = require('dark');
+1. Build the CLI app:
 
-dark()
+```js
+// index.js
+const { default: dark } = require('dark');
+
+const program = dark()
   .version('0.1.0')
   .option('-p, --peppers', 'Add peppers')
   .option('-P, --pineapple', 'Add pineapple')
@@ -38,6 +41,13 @@ if (program.peppers) console.log('  - peppers');
 if (program.pineapple) console.log('  - pineapple');
 if (program.bbqSauce) console.log('  - bbq');
 console.log('  - %s cheese', program.cheese);
+```
+
+2. Run it!:
+```bash
+node index.js -c                  # cheese
+node index.js -c -p               # cheese and peppers
+node index.js --cheese --peppers  # cheese and peppers
 ```
 
 ## Docs
