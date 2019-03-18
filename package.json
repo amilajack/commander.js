@@ -1,6 +1,6 @@
 {
   "name": "dark",
-  "version": "0.0.1",
+  "version": "0.0.2-0",
   "description": "the complete solution for node.js command-line programs",
   "keywords": [
     "cli",
