@@ -10,7 +10,7 @@ export interface AutocompleteEvent {
   reply: (commands: string[]) => void;
 }
 
-export type Args = (string | boolean)[];
+export type Args = string[];
 
 export interface CompletionArgs {
   filename: string[];
@@ -20,9 +20,7 @@ export interface CompletionArgs {
 
 export interface CompletionRules {
   args: CompletionArgs | Args;
-  options: {
-    [x: string]: string;
-  };
+  options: Record<string, Args | Function>;
 }
 
 function processExit(code: number) {
@@ -88,7 +86,7 @@ function humanReadableArgName({
 function autocompleteActiveOption(
   optionRules: Record<string, any>,
   typedArgs: string[]
-): boolean | { reply: Record<string, any> } {
+): false | { reply: Record<string, any> } {
   if (typedArgs.length === 0) {
     return false;
   }
@@ -118,9 +116,9 @@ function autocompleteActiveOption(
  */
 function autocompleteActiveArg(
   optionRules: Record<string, any>,
-  argRules: Record<string, any>[],
+  argRules: Args | Function[],
   typedArgs: string[]
-): Record<string, any> | boolean {
+): string | Function | boolean {
   if (argRules.length === 0) {
     return false;
   }
@@ -153,15 +151,15 @@ function autocompleteActiveArg(
 export class Command extends EventEmitter {
   public commands: Command[] = [];
 
-  public options: Option[] = [];
+  private options: Option[] = [];
 
-  public executables: boolean;
+  private executables: boolean;
 
-  public defaultExecutable: string;
+  private defaultExecutable: string;
 
   private parent: Command;
 
-  public args: string[];
+  private args: string[];
 
   /**
    * The running node process from running a subcommand executable
@@ -264,7 +262,7 @@ export class Command extends EventEmitter {
    */
   public command(
     name: string,
-    desc?: string,
+    desc?: string | null,
     opts: { isDefault?: boolean; noHelp?: boolean } = {
       isDefault: false,
       noHelp: false
@@ -347,7 +345,7 @@ export class Command extends EventEmitter {
   }
 
   /**
-   * Register callback [[fn]] for the command.
+   * Register a callback for a command
    *
    * Examples:
    * ```ts
@@ -362,7 +360,10 @@ export class Command extends EventEmitter {
    * @returns [[Command]] for chaining
    */
   public action(fn: Function): Command {
-    const listener = (args: string[] = [], unknown: string[] = []) => {
+    const listener = (
+      args: (string | Command | any[])[] = [],
+      unknown: string[] = []
+    ) => {
       const parsed = this.parseOptions(unknown);
 
       // Output help if necessary
@@ -376,7 +377,7 @@ export class Command extends EventEmitter {
       }
 
       // Leftover arguments need to be pushed back. Fixes issue #56
-      if (parsed.args.length) args = parsed.args.concat(args);
+      if (parsed.args.length) args = parsed.args.concat(args as Args);
 
       this._args.forEach((arg, i) => {
         if (arg.required && args[i] == null) {
@@ -548,10 +549,28 @@ export class Command extends EventEmitter {
   /**
    * Define completion rules which will later be used by autocomplete to generate appropriate response
    *
+   * ```js
+   * program()
+   *   .arguments('<a> <b>')
+   *   .option('--verbose', 'verbose')
+   *   .option('-n, --name <name>', 'specify name')
+   *   .option('--description <desc>', 'specify description')
+   *   .complete({
+   *     options: {
+   *       '--name': (typedArgs) => ['kate', 'jim'],
+   *       '--description': ['desc1', 'desc2']
+   *     },
+   *     arguments: {
+   *       a: (typedArgs) => ['a-1', 'a-2'],
+   *       b: ['b-1', 'b-2']
+   *     }
+   *   });
+   * ```
+   *
    * @param completion - rules
    */
   public complete(rules: {
-    options: {};
+    options: Record<string, string[] | Function>;
     arguments: {
       filename: string[];
       args: string[];
@@ -624,7 +643,7 @@ export class Command extends EventEmitter {
       const executableName = path.basename(argv[1], '.js');
       const completion = omelette(executableName);
 
-      completion.on('complete', (f: Function, event: AutocompleteEvent) => {
+      completion.on('complete', (_f: Function, event: AutocompleteEvent) => {
         this.autocompleteHandleEvent(event);
       });
 
@@ -744,7 +763,17 @@ export class Command extends EventEmitter {
     const rawRules = this._completionRules;
     const { options } = this;
     const args = this._args;
-    const normalizedRules = { options: {}, args: [] };
+    const normalizedRules: {
+      options: Record<
+        string,
+        {
+          arity: number;
+          sibling: string | null;
+          reply: string[] | Function;
+        }
+      >;
+      args: string[];
+    } = { options: {}, args: [] };
 
     options.forEach(option => {
       if (option.short) {
@@ -855,7 +884,7 @@ export class Command extends EventEmitter {
    * @param args
    * @param unknown
    */
-  private executeSubCommand(argv: string[], args: string[], unknown: any[]) {
+  private executeSubCommand(argv: string[], args: Args, unknown: any[]) {
     args = args.concat(unknown);
 
     if (!args.length) this.help();
@@ -926,6 +955,7 @@ export class Command extends EventEmitter {
     ];
     signals.forEach(signal => {
       process.on(signal, () => {
+        // @ts-ignore
         if (proc.killed === false && proc.exitCode == null) {
           proc.kill(signal);
         }
@@ -1049,7 +1079,7 @@ export class Command extends EventEmitter {
    * @param argv
    * @returns {Array}
    */
-  private parseOptions(argv: Args): { args: Args; unknown: string[] } {
+  private parseOptions(argv: Args): { args: Args; unknown: Args } {
     const args = [];
     const len = argv.length;
     let literal;
@@ -1081,7 +1111,10 @@ export class Command extends EventEmitter {
         // requires arg
         if (option.required) {
           arg = argv[++i];
-          if (arg == null) return this.optionMissingArgument(option);
+          if (arg == null) {
+            this.optionMissingArgument(option);
+            throw new Error('option missing argument');
+          }
           this.emit(`option:${option.name()}`, arg);
           // optional arg
         } else if (option.optional) {
@@ -1138,22 +1171,22 @@ export class Command extends EventEmitter {
   }
 
   /**
-   * Argument `name` is missing.
+   * Log error when rgument `name` is missing.
    *
    * @param name
    */
-  private missingArgument(name: string) {
+  private missingArgument(name: string): void {
     console.error('error: missing required argument `%s`', name);
     processExit(1);
   }
 
   /**
-   * [[Option]] is missing an argument, but received `flag` or nothing.
+   * Log error when [[Option]] is missing an argument, but received `flag` or nothing.
    *
    * @param option
    * @param flag
    */
-  private optionMissingArgument({ flags }: Option, flag?: string) {
+  private optionMissingArgument({ flags }: Option, flag?: string): void {
     if (flag) {
       console.error(
         'error: option `%s` argument missing, got `%s`',
@@ -1167,11 +1200,11 @@ export class Command extends EventEmitter {
   }
 
   /**
-   * Unknown option `flag`.
+   * Log error when received unknown option `flag`
    *
    * @param flag
    */
-  private unknownOption(flag: string) {
+  private unknownOption(flag: string): void {
     if (this._allowUnknownOption) return;
     console.error('error: unknown option `%s`', flag);
     processExit(1);
@@ -1182,29 +1215,29 @@ export class Command extends EventEmitter {
    *
    * @param name
    */
-  private variadicArgNotLast(name: string) {
+  private variadicArgNotLast(name: string): void {
     console.error('error: variadic arguments must be last `%s`', name);
     processExit(1);
   }
 
   /**
-   * Set the program version to `str`.
+   * Set the program version
    *
    * This method auto-registers the "-V, --version" flag
    * which will print the version number when passed.
    *
-   * @param str
+   * @param version
    * @param [flags]
    * @returns [[Command]] for chaining
    */
-  public version(str: string, flags?: string): Command {
-    this._version = str;
+  public version(version: string, flags?: string): Command {
+    this._version = version;
     flags = flags || '-V, --version';
     const versionOption = new Option(flags, 'output the version number');
     this.versionOptionName = versionOption.long.substr(2) || 'version';
     this.options.push(versionOption);
     this.on(`option:${this.versionOptionName}`, () => {
-      process.stdout.write(`${str}\n`);
+      process.stdout.write(`${version}\n`);
       processExit(0);
     });
     return this;
@@ -1263,7 +1296,7 @@ export class Command extends EventEmitter {
   }
 
   /**
-   * Set the command usage `str`.
+   * Set the command usage
    *
    * @param str
    * @returns [[Command]] for chaining
@@ -1499,7 +1532,7 @@ export class Command extends EventEmitter {
    */
   public help(cb?: (a: string) => string) {
     this.outputHelp(cb);
-    processExit();
+    processExit(1);
   }
 }
 

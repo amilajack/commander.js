@@ -52,7 +52,7 @@ node index.js --cheese --peppers  # cheese and peppers
 
 ## Docs
 
-See the [API documentation](https://amilajack.github.io/dark/)
+See the [API docs](https://amilajack.github.io/dark/)
 
 ## Support
 
