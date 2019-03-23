@@ -1,10 +1,10 @@
 /**
- * Camel-case the given `flag`
+ * Camel-case the given `string`
  *
- * @param flag
+ * @param string - the string to camelcase
  */
-function camelcase(flag: string): string {
-  return flag
+function camelcase(string: string): string {
+  return string
     .split('-')
     .reduce(
       (str: string, word: string) => str + word[0].toUpperCase() + word.slice(1)

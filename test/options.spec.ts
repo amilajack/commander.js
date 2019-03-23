@@ -1,21 +1,11 @@
 import program from '../src';
 import Option from '../src/option';
-import sinonCreator from 'sinon';
-
-process.env.DARK_ENV = 'test';
 
 function parseRange(str: string) {
   return str.split('..').map(Number);
 }
 
 describe('basic', () => {
-  beforeEach(() => {
-    // jest.spyOn(console, 'error').mockImplementation(() => {});
-    // jest.spyOn(console, 'log').mockImplementation(() => {});
-    // jest.spyOn(process.stderr, 'write').mockImplementation(() => {});
-    // jest.spyOn(process.stdout, 'write').mockImplementation(() => {});
-  });
-
   test('basic', () => {
     const opt1 = new Option('-p, --peppers', 'to include peppers or not');
     expect(opt1.name()).toEqual('peppers');
@@ -51,10 +41,32 @@ describe('basic', () => {
 });
 
 describe('options', () => {
-  let sinon = sinonCreator.createSandbox();
+  let mockExit;
+  let mockConsoleError;
+  let mockConsoleLog;
+  let mockProcessErrWrite;
+  let mockProcessOutWrite;
 
   beforeEach(() => {
-    sinon = sinonCreator.createSandbox();
+    mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {});
+    mockConsoleError = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+    mockConsoleLog = jest.spyOn(console, 'log').mockImplementation(() => {});
+    mockProcessErrWrite = jest
+      .spyOn(process.stderr, 'write')
+      .mockImplementation();
+    mockProcessOutWrite = jest
+      .spyOn(process.stdout, 'write')
+      .mockImplementation();
+  });
+
+  afterEach(() => {
+    mockExit.mockRestore();
+    mockConsoleError.mockRestore();
+    mockConsoleLog.mockRestore();
+    mockProcessErrWrite.mockRestore();
+    mockProcessOutWrite.mockRestore();
   });
 
   it('should ', () => {
@@ -78,27 +90,16 @@ describe('options', () => {
   });
 
   test('required', () => {
-    const util = require('util');
-
-    const info: string[] = [];
-
-    console.error = (...args: string[]) => {
-      info.push(util.format.apply(util, args));
-    };
-
-    process.on('exit', code => {
-      expect(code).toEqual(1);
-      expect(info.length).toEqual(1);
-      expect(info[0]).toEqual(
-        'error: option `-c, --cheese <type>` argument missing'
-      );
-      process.exit(0);
-    });
-
     program()
       .version('0.0.1')
       .option('-c, --cheese <type>', 'optionally specify the type of cheese')
       .parse(['node', 'test', '--cheese']);
+
+    expect(mockConsoleError).toHaveBeenCalledWith(
+      'error: option `%s` argument missing',
+      '-c, --cheese <type>'
+    );
+    expect(mockExit).toHaveBeenCalledWith(1);
   });
 
   test('bool', () => {
@@ -179,7 +180,7 @@ describe('options', () => {
     expect(prog.myLongRange).toEqual([1, 5]);
   });
 
-  it('should should coerce', () => {
+  it('should coerce', () => {
     function increaseVerbosity(v: string, total: number) {
       return total + 1;
     }
@@ -212,7 +213,7 @@ describe('options', () => {
     expect(prog.float).toEqual(5.5);
     expect(prog.range).toEqual([1, 5]);
     expect(prog.collect).toEqual(['foo', 'bar', 'baz']);
-    expect(prog.verbose).toEqual(5);
+    expect(prog.verbose).toEqual(true);
   });
 
   it('commands', () => {
@@ -236,9 +237,7 @@ describe('options', () => {
       .option('-o, --host [host]', 'Host to use')
       .action(
         (env: string, { setup_mode: setupMode }: { setup_mode: string }) => {
-          const mode = setupMode || 'normal';
           env = env || 'all';
-
           envValue = env;
         }
       );
@@ -639,21 +638,14 @@ describe('options', () => {
   });
 
   test('unknown command', () => {
-    sinon.stub(process, 'exit');
-    sinon.stub(process.stdout, 'write');
-
-    const stubError = sinon.stub(console, 'error');
-
     const cmd = 'my_command';
     const invalidCmd = 'invalid_command';
 
     program()
+      .name('test')
       .command(cmd, 'description')
-
       .parse(['node', 'test', invalidCmd]);
 
-    expect(stubError.callCount).toEqual(1);
-
-    sinon.restore();
+    expect(mockConsoleError).toHaveBeenCalledWith("error: unknown command %s", 'invalid_command');
   });
 });

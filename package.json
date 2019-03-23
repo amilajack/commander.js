@@ -53,9 +53,9 @@
     "eslint-import-resolver-typescript": "^1.1.1",
     "jest": "^24.5.0",
     "jest-cli": "^24.5.0",
-    "jest-mock-process": "^1.2.0",
     "should": "^13.2.3",
     "sinon": "^7.2.7",
+    "ts-node": "^8.0.3",
     "typedoc": "^0.14.2",
     "typedoc-plugin-no-inherit": "^1.1.6",
     "typescript": "^3.3.3333"

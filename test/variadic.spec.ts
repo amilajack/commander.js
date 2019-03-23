@@ -1,8 +1,6 @@
 import util from 'util';
 import program from '../src';
 
-process.env.DARK_ENV = 'test';
-
 describe.skip('variadic', () => {
   test('args', () => {
     const programArgs = [

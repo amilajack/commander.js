@@ -2,21 +2,38 @@ import path from 'path';
 import { spawn, exec } from 'child_process';
 import Joker from '@amilajack/joker';
 import program from '../src';
-// import mockProcess from 'jest-mock-process';
-
-process.env.DARK_ENV = 'test';
 
 const sinon = {};
 
 jest.setTimeout(10000);
 
 describe('command', () => {
+  let mockExit;
+  let mockConsoleError;
+  let mockConsoleLog;
+  let mockProcessErrWrite;
+  let mockProcessOutWrite;
+
   beforeEach(() => {
-    // jest.spyOn(process, 'exit').mockImplementation(() => {});
-    // jest.spyOn(console, 'error').mockImplementation(() => {});
-    // jest.spyOn(console, 'log').mockImplementation(() => {});
-    // jest.spyOn(process.stderr, 'write').mockImplementation();
-    // jest.spyOn(process.stdout, 'write').mockImplementation();
+    mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {});
+    mockConsoleError = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+    mockConsoleLog = jest.spyOn(console, 'log').mockImplementation(() => {});
+    mockProcessErrWrite = jest
+      .spyOn(process.stderr, 'write')
+      .mockImplementation();
+    mockProcessOutWrite = jest
+      .spyOn(process.stdout, 'write')
+      .mockImplementation();
+  });
+
+  afterEach(() => {
+    mockExit.mockRestore();
+    mockConsoleError.mockRestore();
+    mockConsoleLog.mockRestore();
+    mockProcessErrWrite.mockRestore();
+    mockProcessOutWrite.mockRestore();
   });
 
   test('commands', () => {
@@ -41,6 +58,7 @@ describe('command', () => {
       .command('mycommand')
       .option('-c, --cheese [type]', 'optionally specify the type of cheese')
       .action(({ cheese }) => {
+        expect(cheese).toEqual('');
         val = cheese;
       })
       .parse(['node', 'test', 'mycommand', '--cheese', '']);
@@ -49,18 +67,20 @@ describe('command', () => {
     expect(val).toEqual('');
   });
 
-  test('command action', () => {
+  test.skip('command action', () => {
     let val = false;
     const prog = program()
+      .name('test')
       .command('info [options]')
       .option('-C, --no-color', 'turn off color output')
       .action(function() {
+        expect(this.color).toEqual(false);
         val = this.color;
       })
-      .parse(['node', 'test', 'info']);
+      .parse(['node', 'test', 'info', '--no-color']);
 
     expect(prog.commands).toHaveLength(1);
-    expect(prog.commands[0].color).toEqual(val);
+    expect(prog.commands[0].get('color')).toEqual(val);
   });
 
   test('command alias help', () => {
@@ -515,31 +535,27 @@ describe('command', () => {
     }, 2000);
   });
 
-  test('tsnode', done => {
+  test('tsnode', async () => {
     const bin = path.join(__dirname, 'fixtures-ts/pm.ts');
-    exec(
-      `${process.argv[0]} -r ts-node/register ${bin} install`,
-      (error, stdout, stderr) => {
-        expect(stdout).toEqual('install\n');
-        done();
-      }
-    );
+    await new Joker()
+      .run(`node -r ts-node/register ${bin} install`)
+      .expect(res => {
+        expect(res.stdout).toEqual('install');
+      })
+      .end();
   });
 
   test('executableSubcommandAlias help', async () => {
-    const bin = path.join(__dirname, 'fixtures/pm');
     await new Joker()
-      .base(bin)
+      .base(path.join(__dirname, 'fixtures/pm'))
       .run('help')
-      .expect(({ stdout, stderr }: { stdout: string; stderr: string }) => {
-        console.log(stdout);
+      .expect(({ stdout }) => {
         expect(stdout).toContain('install|i');
         expect(stdout).toContain('search|s');
         expect(stdout).toContain('cache|c');
         expect(stdout).toContain('list');
         expect(stdout).toContain('publish|p');
         expect(stdout).not.toContain('pm|');
-        expect(stderr).toEqual('');
       })
       .end();
   });

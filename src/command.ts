@@ -23,12 +23,6 @@ export interface CompletionRules {
   options: Record<string, Args | Function>;
 }
 
-function processExit(code: number) {
-  if (process.env.DARK_ENV !== 'test') {
-    process.exit(code);
-  }
-}
-
 /**
  * Pad `str` to `width`.
  *
@@ -51,7 +45,7 @@ function outputHelpIfNecessary(cmd: Command, options: string[] = []) {
   for (let i = 0; i < options.length; i++) {
     if (options[i] === '--help' || options[i] === '-h') {
       cmd.outputHelp();
-      processExit(0);
+      process.exit(0);
     }
   }
 }
@@ -971,9 +965,7 @@ export class Command extends EventEmitter {
           bin
         );
       }
-      if (process.env.NODE_ENV !== 'test') {
-        processExit(1);
-      }
+      process.exit(1);
     });
 
     // Store the reference to the child process
@@ -1113,7 +1105,7 @@ export class Command extends EventEmitter {
           arg = argv[++i];
           if (arg == null) {
             this.optionMissingArgument(option);
-            throw new Error('option missing argument');
+            return { args: [], unknown: [] };
           }
           this.emit(`option:${option.name()}`, arg);
           // optional arg
@@ -1177,7 +1169,7 @@ export class Command extends EventEmitter {
    */
   private missingArgument(name: string): void {
     console.error('error: missing required argument `%s`', name);
-    processExit(1);
+    process.exit(1);
   }
 
   /**
@@ -1196,7 +1188,7 @@ export class Command extends EventEmitter {
     } else {
       console.error('error: option `%s` argument missing', flags);
     }
-    processExit(1);
+    process.exit(1);
   }
 
   /**
@@ -1207,7 +1199,7 @@ export class Command extends EventEmitter {
   private unknownOption(flag: string): void {
     if (this._allowUnknownOption) return;
     console.error('error: unknown option `%s`', flag);
-    processExit(1);
+    process.exit(1);
   }
 
   /**
@@ -1217,7 +1209,7 @@ export class Command extends EventEmitter {
    */
   private variadicArgNotLast(name: string): void {
     console.error('error: variadic arguments must be last `%s`', name);
-    processExit(1);
+    process.exit(1);
   }
 
   /**
@@ -1238,7 +1230,7 @@ export class Command extends EventEmitter {
     this.options.push(versionOption);
     this.on(`option:${this.versionOptionName}`, () => {
       process.stdout.write(`${version}\n`);
-      processExit(0);
+      process.exit(0);
     });
     return this;
   }
@@ -1532,7 +1524,7 @@ export class Command extends EventEmitter {
    */
   public help(cb?: (a: string) => string) {
     this.outputHelp(cb);
-    processExit(1);
+    process.exit(1);
   }
 }
 
