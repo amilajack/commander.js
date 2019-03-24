@@ -14,7 +14,7 @@ const prog = program()
   .option('-b, --bbq', 'Add bbq sauce')
   .option('-c, --cheese <type>', 'Add the specified type of cheese [marble]')
   .option('-C, --no-cheese', 'You do not want any cheese')
-  .parse(process.argv);
+  .init();
 
 console.log('you ordered a pizza with:');
 if (prog.peppers) console.log('  - peppers');

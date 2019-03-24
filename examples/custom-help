@@ -12,7 +12,7 @@ const prog = program()
   .option('-b, --bar', 'enable some bar')
   .option('-B, --baz', 'enable some baz');
 
-// must be before .parse() since
+// must be before .init() since
 // node's emit() is immediate
 
 prog.on('--help', function() {
@@ -23,6 +23,6 @@ prog.on('--help', function() {
   console.log('  $ custom-help -h');
 });
 
-prog.parse(process.argv);
+prog.init();
 
 prog.help();

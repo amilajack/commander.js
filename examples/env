@@ -12,7 +12,7 @@ program()
     cmdValue = cmd;
     envValue = env;
   })
-  .parse(process.argv);
+  .init();
 
 if (typeof cmdValue === 'undefined') {
   console.error('no command given!');

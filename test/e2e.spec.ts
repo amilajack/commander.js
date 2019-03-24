@@ -10,17 +10,23 @@ describe('E2E', () => {
       .run('--version')
       .stdout('0.0.1')
       .code(0)
+      .run('help')
+      .stdout('sfd')
+      .code(0)
       .run('foo')
       .stdout('foo')
       .code(0)
       .end();
   });
 
-  it.concurrent('should do basic stuff', async () => {
+  it.concurrent('should assertion node version for pm fixture', async () => {
     await new Joker()
       .base(`node ${pmFixture}`)
       .run('--version')
       .stdout('0.0.1')
+      .code(0)
+      .run('help')
+      .stdout('sfd')
       .code(0)
       .run('non-existent-command')
       .stdout('default')

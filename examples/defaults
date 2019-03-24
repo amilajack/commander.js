@@ -28,7 +28,7 @@ const prog = program()
     list,
     [1, 2, 3]
   )
-  .parse(process.argv);
+  .init();
 
 console.log('  - %s template engine', prog.templateEngine);
 console.log('  - %s cheese', prog.cheese);

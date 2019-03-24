@@ -74,7 +74,7 @@ describe('options', () => {
       program()
         .version('0.0.1')
         .option('-c, --cheese [type]', 'optionally specify the type of cheese')
-        .parse(['node', 'test', '--cheese', 'feta'])
+        .init(['node', 'test', '--cheese', 'feta'])
         .get('cheese')
     ).toEqual('feta');
   });
@@ -84,7 +84,7 @@ describe('options', () => {
       program()
         .version('0.0.1')
         .option('-c, --cheese [type]', 'optionally specify the type of cheese')
-        .parse(['node', 'test', '--cheese'])
+        .init(['node', 'test', '--cheese'])
         .get('cheese')
     ).toEqual(true);
   });
@@ -93,7 +93,7 @@ describe('options', () => {
     program()
       .version('0.0.1')
       .option('-c, --cheese <type>', 'optionally specify the type of cheese')
-      .parse(['node', 'test', '--cheese']);
+      .init(['node', 'test', '--cheese']);
 
     expect(mockConsoleError).toHaveBeenCalledWith(
       'error: option `%s` argument missing',
@@ -107,7 +107,7 @@ describe('options', () => {
       .version('0.0.1')
       .option('-p, --pepper', 'add pepper')
       .option('-c, --no-cheese', 'remove cheese')
-      .parse(['node', 'test', '--pepper']);
+      .init(['node', 'test', '--pepper']);
     expect(prog.get('pepper')).toEqual(true);
     expect(prog.get('cheese')).toEqual(true);
   });
@@ -117,7 +117,7 @@ describe('options', () => {
       .version('0.0.1')
       .option('-p, --pepper', 'add pepper')
       .option('-c|--no-cheese', 'remove cheese')
-      .parse(['node', 'test', '--no-cheese']);
+      .init(['node', 'test', '--no-cheese']);
     expect(() => prog.get('pepper')).toThrow('Option "pepper" does not exist');
     expect(prog.get('cheese')).toEqual(false);
   });
@@ -127,7 +127,7 @@ describe('options', () => {
       .version('0.0.1')
       .option('-p, --pepper', 'add pepper')
       .option('-c, --no-cheese', 'remove cheese')
-      .parse(['node', 'test', '-pc']);
+      .init(['node', 'test', '-pc']);
     expect(prog.get('pepper')).toEqual(true);
     expect(prog.get('cheese')).toEqual(false);
   });
@@ -137,7 +137,7 @@ describe('options', () => {
       .version('0.0.1')
       .option('-p, --pepper', 'add pepper')
       .option('-c, --no-cheese', 'remove cheese')
-      .parse(['node', 'test', '-p', '-c']);
+      .init(['node', 'test', '-p', '-c']);
     expect(prog.get('pepper')).toEqual(true);
     expect(prog.get('cheese')).toEqual(false);
   });
@@ -151,7 +151,7 @@ describe('options', () => {
       .option('-y, --yother', 'just some other option')
       .option('-z, --zother', 'just some other option')
 
-      .parse(['node', 'test', '--cflags', '-DDEBUG', '-o', '-xyz']);
+      .init(['node', 'test', '--cflags', '-DDEBUG', '-o', '-xyz']);
     expect(prog).toHaveProperty('cflags', '-DDEBUG');
     expect(prog).toHaveProperty('other');
     expect(prog).toHaveProperty('xother');
@@ -169,7 +169,7 @@ describe('options', () => {
       .option('-u, --my-URL-count <n>', 'pass a float', parseFloat)
       .option('-r, --my-long-range <a..b>', 'pass a range', parseRange)
 
-      .parse(
+      .init(
         'node test -i 5.5 -f 5.5 -m 6.5 -u 7.5 -n 15.99 -r 1..5'.split(' ')
       );
     expect(prog.myInt).toEqual(5);
@@ -203,7 +203,7 @@ describe('options', () => {
         collectValues,
         []
       )
-      .parse(
+      .init(
         'node test -i 5.5 -f 5.5 -n 15.99 -r 1..5 -c foo -c bar -c baz -vvvv --verbose'.split(
           ' '
         )
@@ -260,7 +260,7 @@ describe('options', () => {
       .action(env => {
         console.log('deploying "%s"', env);
       })
-      .parse(['node', 'test', '--config', 'conf']);
+      .init(['node', 'test', '--config', 'conf']);
 
     expect(prog.get('config')).toEqual('conf');
     expect(prog.commands[0]).not.toHaveProperty('setup_mode');
@@ -268,7 +268,7 @@ describe('options', () => {
     expect(envValue).toEqual('');
     expect(cmdValue).toEqual('');
 
-    prog = prog.parse([
+    prog = prog.init([
       'node',
       'test',
       '--config',
@@ -283,7 +283,7 @@ describe('options', () => {
     expect(prog.commands[0]).not.toHaveProperty('host');
     expect(envValue).toEqual('env1');
 
-    prog = prog.parse([
+    prog = prog.init([
       'node',
       'test',
       '--config',
@@ -300,7 +300,7 @@ describe('options', () => {
     expect(prog.commands[0].host).toEqual('host1');
     expect(envValue).toEqual('env2');
 
-    prog = prog.parse([
+    prog = prog.init([
       'node',
       'test',
       '--config',
@@ -314,7 +314,7 @@ describe('options', () => {
     expect(prog.commands[0].setup_mode).toEqual('mode4');
     expect(envValue).toEqual('env3');
 
-    prog = prog.parse([
+    prog = prog.init([
       'node',
       'test',
       '--config',
@@ -329,7 +329,7 @@ describe('options', () => {
     expect(prog.commands[1]).not.toHaveProperty('target');
     expect(cmdValue).toEqual('exec1');
 
-    prog = prog.parse([
+    prog = prog.init([
       'node',
       'test',
       '--config',
@@ -343,7 +343,7 @@ describe('options', () => {
     expect(prog.commands[1].exec_mode).toEqual('mode2');
     expect(cmdValue).toEqual('exec2');
 
-    prog = prog.parse([
+    prog = prog.init([
       'node',
       'test',
       '--config',
@@ -361,7 +361,7 @@ describe('options', () => {
     expect(cmdValue).toEqual('exec3');
 
     delete prog.commands[1].target;
-    prog = prog.parse([
+    prog = prog.init([
       'node',
       'test',
       '--config',
@@ -389,14 +389,14 @@ describe('options', () => {
     const oldProcessStdoutWrite = process.stdout.write;
     process.stdout.write = () => {};
     try {
-      prog.parse(['node', 'test', '--config', 'conf6', 'exec', '--help']);
+      prog.init(['node', 'test', '--config', 'conf6', 'exec', '--help']);
     } catch (ex) {
       expect(prog.config).toEqual('conf6');
     }
     process.stdout.write = oldProcessStdoutWrite;
 
     try {
-      prog.parse([
+      prog.init([
         'node',
         'test',
         '--config',
@@ -434,7 +434,7 @@ describe('options', () => {
 
     expect(prog).toHaveProperty('_name', '');
 
-    prog = prog.parse(['node', 'test']);
+    prog = prog.init(['node', 'test']);
     expect(prog).toHaveProperty('_name', 'test');
     expect(prog).not.toHaveProperty('anchovies');
     expect(prog).not.toHaveProperty('onions');
@@ -461,7 +461,7 @@ describe('options', () => {
         'optionally specify the type of cheese',
         'mozzarella'
       )
-      .parse([
+      .init([
         'node',
         'test',
         '--anchovies',
@@ -487,7 +487,7 @@ describe('options', () => {
       .option('--string <n>', 'pass a string')
       .option('--string2 <n>', 'pass another string')
       .option('--num <n>', 'pass a number', Number)
-      .parse(
+      .init(
         'node test --string=Hello --string2 Hello=World --num=5.5'.split(' ')
       );
     expect(prog.get('string')).toEqual('Hello');
@@ -504,7 +504,7 @@ describe('options', () => {
       .option('-M, --no-magic', 'disable magic')
       .option('-c, --camel-case', 'convert to camelCase')
       .option('-q, --quux <quux>', 'add some quux')
-      .parse([
+      .init([
         'node',
         'test',
         '--foo',
@@ -532,7 +532,7 @@ describe('options', () => {
       .option('-a, --alpha <a>', 'hyphen')
       .option('-b, --bravo <b>', 'hyphen')
       .option('-c, --charlie <c>', 'hyphen')
-      .parse('node test -a - --bravo - --charlie=- - -- - -t1'.split(' '));
+      .init('node test -a - --bravo - --charlie=- - -- - -t1'.split(' '));
 
     expect(prog.get('alpha')).toEqual('-');
     expect(prog.get('bravo')).toEqual('-');
@@ -546,7 +546,7 @@ describe('options', () => {
     const prog = program()
       .version('0.0.1')
       .option('--longflag [value]', 'A long only flag with a value')
-      .parse(['node', 'test', '--longflag', 'something']);
+      .init(['node', 'test', '--longflag', 'something']);
     expect(prog.get('longflag')).toEqual('something');
   });
 
@@ -554,7 +554,7 @@ describe('options', () => {
     const prog = program()
       .version('0.0.1')
       .option('--verbose', 'do stuff')
-      .parse(['node', 'test', '--verbose']);
+      .init(['node', 'test', '--verbose']);
     expect(prog.get('verbose')).toEqual(true);
   });
 
@@ -568,7 +568,7 @@ describe('options', () => {
         'medium'
       )
       .option('-d, --drink [drink]', 'Drink', /^(Coke|Pepsi|Izze)$/i)
-      .parse('node test -s big -d coke'.split(' '));
+      .init('node test -s big -d coke'.split(' '));
     expect(prog.get('size')).toEqual('medium');
     expect(prog.get('drink')).toEqual('coke');
   });
@@ -597,7 +597,7 @@ describe('options', () => {
       process.stdout.write = output => {
         capturedOutput += output;
       };
-      prog.parse(['node', 'test', flag]);
+      prog.init(['node', 'test', flag]);
       process.exit = oldProcessExit;
       process.stdout.write = oldProcessStdoutWrite;
       expect(capturedOutput).toEqual('0.0.1\n');
@@ -629,7 +629,7 @@ describe('options', () => {
       process.stdout.write = output => {
         capturedOutput += output;
       };
-      prog.parse(['node', 'test', flag]);
+      prog.init(['node', 'test', flag]);
       process.exit = oldProcessExit;
       process.stdout.write = oldProcessStdoutWrite;
       expect(capturedOutput).toEqual('0.0.1\n');
@@ -644,7 +644,7 @@ describe('options', () => {
     program()
       .name('test')
       .command(cmd, 'description')
-      .parse(['node', 'test', invalidCmd]);
+      .init(['node', 'test', invalidCmd]);
 
     expect(mockConsoleError).toHaveBeenCalledWith("error: unknown command %s", 'invalid_command');
   });

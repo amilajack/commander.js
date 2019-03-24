@@ -41,4 +41,4 @@ prog.command('*').action(function(env) {
   console.log('deploying "%s"', env);
 });
 
-prog.parse(process.argv);
+prog.init();

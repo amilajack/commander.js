@@ -11,7 +11,7 @@ const prog = program()
   .usage('test')
   .option('-s --size <size>', 'Pizza size', /^(large|medium|small)$/i, 'medium')
   .option('-d --drink [drink]', 'Drink', /^(coke|pepsi|izze)$/i)
-  .parse(process.argv);
+  .init();
 
 console.log(' size: %j', prog.size);
 console.log(' drink: %j', prog.drink);

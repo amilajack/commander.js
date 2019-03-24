@@ -247,7 +247,7 @@ export class Command extends EventEmitter {
    *     console.log('deploying "%s"', env);
    *   });
    *
-   * prog.parse(process.argv);
+   * prog.init();
    * ```
    *
    * @param name
@@ -262,11 +262,12 @@ export class Command extends EventEmitter {
       noHelp: false
     }
   ): Command {
+    // If opts is used as the second argument of `command`,
+    // use desc arg as opts arg
     if (typeof desc === 'object' && desc != null) {
       opts = desc;
       desc = null;
     }
-    opts = opts || {};
     const args = name.split(/ +/);
     const cmd = new Command(args.shift());
 
@@ -588,28 +589,28 @@ export class Command extends EventEmitter {
     return this;
   }
 
+  private isEmptyRule({
+    options,
+    args
+  }: {
+    options: Record<string, any>;
+    args: Record<string, any>;
+  }) {
+    return (
+      Object.keys(options).length === 0 && Object.keys(args).length === 0
+    );
+  }
+
   /**
    * Test if any complete rules has been defined for current command or its subcommands.
    *
    * @returns if any complete rules has been defined for current command or its subcommands.
    */
   private hasCompletionRules(): boolean {
-    function isEmptyRule({
-      options,
-      args
-    }: {
-      options: Record<string, any>;
-      args: Record<string, any>;
-    }) {
-      return (
-        Object.keys(options).length === 0 && Object.keys(args).length === 0
-      );
-    }
-
     return !(
-      isEmptyRule(this._completionRules) &&
+      this.isEmptyRule(this._completionRules) &&
       this.commands.every(({ _completionRules }) =>
-        isEmptyRule(_completionRules)
+        this.isEmptyRule(_completionRules)
       )
     );
   }
@@ -803,11 +804,21 @@ export class Command extends EventEmitter {
 
   /**
    * Parse `argv`, settings options and invoking commands when defined.
+   * Arguments to `argv` come in the following form:
    *
-   * @param argv
+   * ```js
+   * ['/path/to/node', '/path/to/command', 'help']
+   * ```
+   *
+   * The second argument is the path to the command. This is usually the entrypoint
+   * of your `dark` cli app.
+   *
+   * The third argument is the name of the subcommand you want to call.
+   *
+   * @param argv - the argments to parse and send to your cli app
    * @returns [[Command]] for chaining
    */
-  public parse(argv: Args): Command {
+  public init(argv: Args = process.argv): Command {
     // trigger autocomplete first if some completion rules have been defined
     if (this.hasCompletionRules()) {
       this.autocomplete(argv);
@@ -881,8 +892,7 @@ export class Command extends EventEmitter {
   private executeSubCommand(argv: string[], args: Args, unknown: any[]) {
     args = args.concat(unknown);
 
-    if (!args.length) this.help();
-    if (args[0] === 'help' && args.length === 1) this.help();
+    if (!args.length || args[0] === 'help' && args.length === 1) this.help();
 
     // <cmd> --help
     if (args[0] === 'help') {
@@ -1520,16 +1530,16 @@ export class Command extends EventEmitter {
   }
 
   /**
-   * Output help information and exit.
+   * Output help information and exit with code 0
    */
   public help(cb?: (a: string) => string) {
     this.outputHelp(cb);
-    process.exit(1);
+    process.exit(0);
   }
 }
 
 /**
- * Expose the root command.
+ * Return a new instance
  */
 
 export default function CommandFactory(name?: string) {

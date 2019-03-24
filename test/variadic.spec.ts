@@ -22,7 +22,7 @@ describe.skip('variadic', () => {
         requiredArg = arg0;
         variadicArg = arg1;
       })
-      .parse(programArgs);
+      .init(programArgs);
 
     expect(requiredArg).toEqual('arg0');
     expect(variadicArg).toEqual(['arg1', 'arg2', 'arg3']);
@@ -50,7 +50,7 @@ describe.skip('variadic', () => {
     };
 
     try {
-      prog2.parse(programArgs);
+      prog2.init(programArgs);
     } catch (err) {
       errorMessage = err.message;
     }

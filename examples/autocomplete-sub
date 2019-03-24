@@ -48,4 +48,4 @@ program()
       }
     }
   })
-  .parse(process.argv);
+  .init();

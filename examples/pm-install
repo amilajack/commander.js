@@ -2,9 +2,7 @@
 
 const { default: program } = require('..');
 
-const prog = program
-  .option('-f, --force', 'force installation')
-  .parse(process.argv);
+const prog = program.option('-f, --force', 'force installation').init();
 
 const pkgs = prog.args;
 

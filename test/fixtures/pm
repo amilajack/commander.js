@@ -2,7 +2,7 @@
 
 const { default: program } = require('../../');
 
-program()
+module.exports = program()
   .version('0.0.1')
   .command('install [name]', 'install one or more packages')
   .alias('i')
@@ -16,4 +16,4 @@ program()
   .command('publish', 'publish or update package')
   .alias('p')
   .command('default', 'default command', { noHelp: true, isDefault: true })
-  .parse(process.argv);
+  .init();

@@ -38,7 +38,7 @@ const prog = program()
     increaseVerbosity,
     0
   )
-  .parse(process.argv);
+  .init();
 
 console.log(' int: %j', prog.integer);
 console.log(' float: %j', prog.float);

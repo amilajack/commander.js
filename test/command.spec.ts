@@ -45,7 +45,7 @@ describe('command', () => {
       .action(({ cheese }) => {
         val = cheese;
       })
-      .parse(['node', 'test', 'mycommand', '--cheese', '']);
+      .init(['node', 'test', 'mycommand', '--cheese', '']);
 
     expect(prog).toHaveProperty('commands', expect.any(Object));
     expect(val).toEqual('');
@@ -61,7 +61,7 @@ describe('command', () => {
         expect(cheese).toEqual('');
         val = cheese;
       })
-      .parse(['node', 'test', 'mycommand', '--cheese', '']);
+      .init(['node', 'test', 'mycommand', '--cheese', '']);
 
     expect(prog.get('cheese')).toEqual('');
     expect(val).toEqual('');
@@ -77,7 +77,7 @@ describe('command', () => {
         expect(this.color).toEqual(false);
         val = this.color;
       })
-      .parse(['node', 'test', 'info', '--no-color']);
+      .init(['node', 'test', 'info', '--no-color']);
 
     expect(prog.commands).toHaveLength(1);
     expect(prog.commands[0].get('color')).toEqual(val);
@@ -91,7 +91,7 @@ describe('command', () => {
       .command('save [file]')
       .alias('s')
       .action(() => {})
-      .parse(['node', 'test']);
+      .init(['node', 'test']);
 
     expect(prog.commandHelp()).toContain('info|i');
     expect(prog.commandHelp()).toContain('save|s');
@@ -108,7 +108,7 @@ describe('command', () => {
     let prog = program()
       .version('0.0.1')
       .option('-p, --pepper', 'add pepper')
-      .parse('node test -m'.split(' '));
+      .init('node test -m'.split(' '));
 
     expect(stubError.callCount).toEqual(1);
 
@@ -122,7 +122,7 @@ describe('command', () => {
     prog = prog
       .command('sub')
       .action(() => {})
-      .parse('node test sub -m'.split(' '));
+      .init('node test sub -m'.split(' '));
 
     expect(stubError.callCount).toEqual(2);
     expect(stubExit.calledOnce).toBe(true);
@@ -133,7 +133,7 @@ describe('command', () => {
       .version('0.0.1')
       .option('-p, --pepper', 'add pepper')
       .allowUnknownOption()
-      .parse('node test -m'.split(' '));
+      .init('node test -m'.split(' '));
 
     expect(stubError.callCount).toEqual(0);
     expect(stubExit.calledOnce).toBe(false);
@@ -144,7 +144,7 @@ describe('command', () => {
       .command('sub2')
       .allowUnknownOption()
       .action(() => {})
-      .parse('node test sub2 -m'.split(' '));
+      .init('node test sub2 -m'.split(' '));
 
     expect(stubError.callCount).toEqual(1);
     expect(stubExit.calledOnce).toBe(false);
@@ -719,7 +719,7 @@ describe('command', () => {
   test.skip('name', () => {
     let prog = program()
       .command('mycommand [options]', 'this is my command')
-      .parse(['node', 'test']);
+      .init(['node', 'test']);
 
     expect(prog.name).toBeInstanceOf(Function);
     expect(prog.name()).toEqual('test');
@@ -762,12 +762,12 @@ describe('command', () => {
       .action(() => {
         console.log('Version command invoked');
       })
-      .parse(['node', 'test', 'version']);
+      .init(['node', 'test', 'version']);
 
     var output = process.stdout.write.args[0];
     expect(output[0]).toEqual('Version command invoked\n');
 
-    prog = prog.parse(['node', 'test', '--version']);
+    prog = prog.init(['node', 'test', '--version']);
 
     var output = process.stdout.write.args[1];
     expect(output[0]).toEqual('0.0.1\n');
@@ -792,7 +792,7 @@ describe('command', () => {
         noHelp: true
       });
 
-    prog = prog.parse(['node', 'test']);
+    prog = prog.init(['node', 'test']);
 
     expect(prog.name).toBeInstanceOf(Function);
     expect(prog.name()).toEqual('test');
@@ -838,7 +838,7 @@ describe('command', () => {
       .action(() => {
         val = true;
       })
-      .parse(['node', 'test']);
+      .init(['node', 'test']);
 
     expect(val).toBe(false);
   });
@@ -853,7 +853,7 @@ describe('command', () => {
 
     program()
       .command(cmd, 'description')
-      .parse(['node', 'test', cmd]);
+      .init(['node', 'test', cmd]);
 
     expect(stubError.callCount).toEqual(0);
     const output = process.stdout.write.args;
@@ -869,7 +869,7 @@ describe('command', () => {
       .action(function() {
         val = this.color;
       })
-      .parse(['node', 'test']);
+      .init(['node', 'test']);
 
     expect(prog.get('color')).toEqual(val);
   });
@@ -879,13 +879,13 @@ describe('command', () => {
       .version('0.0.1')
       .option('-f, --foo', 'add some foo')
       .option('-b, --bar', 'add some bar')
-      .parse(['node', 'test', '--foo', '--', '--bar', 'baz']);
+      .init(['node', 'test', '--foo', '--', '--bar', 'baz']);
     expect(prog.get('foo')).toBe(true);
     expect(() => prog.get('bar')).toThrow();
     expect(prog.args).toEqual(['--bar', 'baz']);
 
     // subsequent literals are passed-through as args
-    prog = prog.parse(['node', 'test', '--', 'cmd', '--', '--arg']);
+    prog = prog.init(['node', 'test', '--', 'cmd', '--', '--arg']);
     expect(prog.args).toEqual(['cmd', '--', '--arg']);
   });
 });

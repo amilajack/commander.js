@@ -19,7 +19,7 @@ const prog = program()
     'specify stylesheet engine (stylus|sass|less) [css]',
     'css'
   )
-  .parse(process.argv);
+  .init();
 
 console.log(' - sessions %j', prog.sessions);
 console.log(' - template %j', prog.template);

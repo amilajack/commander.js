@@ -12,7 +12,7 @@ program()
   .command('list', 'list packages installed')
   .command('publish', 'publish the package')
   .alias('p')
-  .parse(process.argv);
+  .init();
 
 // here .command() is invoked with a description,
 // and no .action(callback) calls to handle sub-commands.
