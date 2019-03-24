@@ -172,12 +172,12 @@ describe('options', () => {
       .init(
         'node test -i 5.5 -f 5.5 -m 6.5 -u 7.5 -n 15.99 -r 1..5'.split(' ')
       );
-    expect(prog.myInt).toEqual(5);
-    expect(prog.myNum).toEqual(15.99);
-    expect(prog.myFLOAT).toEqual(5.5);
-    expect(prog.myVeryLongFloat).toEqual(6.5);
-    expect(prog.myURLCount).toEqual(7.5);
-    expect(prog.myLongRange).toEqual([1, 5]);
+    expect(prog.get('myInt')).toEqual(5);
+    expect(prog.get('myNum')).toEqual(15.99);
+    expect(prog.get('myFLOAT')).toEqual(5.5);
+    expect(prog.get('myVeryLongFloat')).toEqual(6.5);
+    expect(prog.get('myURLCount')).toEqual(7.5);
+    expect(prog.get('myLongRange')).toEqual([1, 5]);
   });
 
   it('should coerce', () => {
@@ -208,12 +208,12 @@ describe('options', () => {
           ' '
         )
       );
-    expect(prog.int).toEqual(5);
-    expect(prog.num).toEqual(15.99);
-    expect(prog.float).toEqual(5.5);
-    expect(prog.range).toEqual([1, 5]);
-    expect(prog.collect).toEqual(['foo', 'bar', 'baz']);
-    expect(prog.verbose).toEqual(true);
+    expect(prog.get('int')).toEqual(5);
+    expect(prog.get('num')).toEqual(15.99);
+    expect(prog.get('float')).toEqual(5.5);
+    expect(prog.get('range')).toEqual([1, 5]);
+    expect(prog.get('collect')).toEqual(['foo', 'bar', 'baz']);
+    expect(prog.get('verbose')).toEqual(true);
   });
 
   it('commands', () => {
@@ -278,8 +278,8 @@ describe('options', () => {
       'mode2',
       'env1'
     ]);
-    expect(prog.config).toEqual('conf1');
-    expect(prog.commands[0].setup_mode).toEqual('mode2');
+    expect(prog.get('config')).toEqual('conf1');
+    expect(prog.commands[0].get('setup_mode')).toEqual('mode2');
     expect(prog.commands[0]).not.toHaveProperty('host');
     expect(envValue).toEqual('env1');
 
@@ -295,9 +295,9 @@ describe('options', () => {
       'host1',
       'env2'
     ]);
-    expect(prog.config).toEqual('conf2');
-    expect(prog.commands[0].setup_mode).toEqual('mode3');
-    expect(prog.commands[0].host).toEqual('host1');
+    expect(prog.get('config')).toEqual('conf2');
+    expect(prog.commands[0].get('setup_mode')).toEqual('mode3');
+    expect(prog.commands[0].get('host')).toEqual('host1');
     expect(envValue).toEqual('env2');
 
     prog = prog.init([
@@ -310,8 +310,8 @@ describe('options', () => {
       'mode4',
       'env3'
     ]);
-    expect(prog.config).toEqual('conf3');
-    expect(prog.commands[0].setup_mode).toEqual('mode4');
+    expect(prog.get('config')).toEqual('conf3');
+    expect(prog.commands[0].get('setup_mode')).toEqual('mode4');
     expect(envValue).toEqual('env3');
 
     prog = prog.init([
@@ -324,8 +324,8 @@ describe('options', () => {
       'mode1',
       'exec1'
     ]);
-    expect(prog.config).toEqual('conf4');
-    expect(prog.commands[1].exec_mode).toEqual('mode1');
+    expect(prog.get('config')).toEqual('conf4');
+    expect(prog.commands[1].get('exec_mode')).toEqual('mode1');
     expect(prog.commands[1]).not.toHaveProperty('target');
     expect(cmdValue).toEqual('exec1');
 
@@ -340,7 +340,7 @@ describe('options', () => {
       'exec2'
     ]);
     expect(prog.get('config')).toEqual('conf5');
-    expect(prog.commands[1].exec_mode).toEqual('mode2');
+    expect(prog.commands[1].get('exec_mode')).toEqual('mode2');
     expect(cmdValue).toEqual('exec2');
 
     prog = prog.init([
@@ -355,11 +355,12 @@ describe('options', () => {
       'mode6',
       'exec3'
     ]);
-    expect(prog.config).toEqual('conf6');
-    expect(prog.commands[1].exec_mode).toEqual('mode6');
-    expect(prog.commands[1].target).toEqual('target1');
+    expect(prog.get('config')).toEqual('conf6');
+    expect(prog.commands[1].get('exec_mode')).toEqual('mode6');
+    expect(prog.commands[1].get('target')).toEqual('target1');
     expect(cmdValue).toEqual('exec3');
 
+    // @ts-ignore
     delete prog.commands[1].target;
     prog = prog.init([
       'node',
@@ -371,29 +372,16 @@ describe('options', () => {
       'mode3',
       'exec4'
     ]);
-    expect(prog.config).toEqual('conf7');
-    expect(prog.commands[1].exec_mode).toEqual('mode3');
+    expect(prog.get('config')).toEqual('conf7');
+    expect(prog.commands[1].get('exec_mode')).toEqual('mode3');
     expect(prog.commands[1]).not.toHaveProperty('target');
     expect(cmdValue).toEqual('exec4');
 
-    // Make sure we still catch errors with required values for options
-    let exceptionOccurred = false;
-    const oldProcessExit = process.exit;
-    const oldConsoleError = console.error;
-    process.exit = () => {
-      exceptionOccurred = true;
-      throw new Error();
-    };
-    console.error = () => {};
-
-    const oldProcessStdoutWrite = process.stdout.write;
-    process.stdout.write = () => {};
     try {
       prog.init(['node', 'test', '--config', 'conf6', 'exec', '--help']);
     } catch (ex) {
-      expect(prog.config).toEqual('conf6');
+      expect(prog.get('config')).toEqual('conf6');
     }
-    process.stdout.write = oldProcessStdoutWrite;
 
     try {
       prog.init([
@@ -409,8 +397,7 @@ describe('options', () => {
       ]);
     } catch (ex) {}
 
-    process.exit = oldProcessExit;
-    expect(exceptionOccurred).toEqual(true);
+    expect(mockExit).toHaveBeenCalled();
     expect(customHelp).toEqual(true);
   });
 
@@ -537,9 +524,9 @@ describe('options', () => {
     expect(prog.get('alpha')).toEqual('-');
     expect(prog.get('bravo')).toEqual('-');
     expect(prog.get('charlie')).toEqual('-');
-    expect(prog.args[0]).toEqual('-');
-    expect(prog.args[1]).toEqual('-');
-    expect(prog.args[2]).toEqual('-t1');
+    expect(prog.get('args')[0]).toEqual('-');
+    expect(prog.get('args')[1]).toEqual('-');
+    expect(prog.get('args')[2]).toEqual('-t1');
   });
 
   test('large only with value', () => {
@@ -580,26 +567,14 @@ describe('options', () => {
     let capturedExitCode;
     let capturedOutput;
     let oldProcessExit;
-    let oldProcessStdoutWrite;
 
     let prog = program()
       .version('0.0.1', '-r, --revision')
       .description('description');
 
     ['-r', '--revision'].forEach(flag => {
-      capturedExitCode = -1;
-      capturedOutput = '';
-      oldProcessExit = process.exit;
-      oldProcessStdoutWrite = process.stdout.write;
-      process.exit = code => {
-        capturedExitCode = code;
-      };
-      process.stdout.write = output => {
-        capturedOutput += output;
-      };
       prog.init(['node', 'test', flag]);
       process.exit = oldProcessExit;
-      process.stdout.write = oldProcessStdoutWrite;
       expect(capturedOutput).toEqual('0.0.1\n');
       expect(capturedExitCode).toEqual(0);
     });
@@ -611,27 +586,13 @@ describe('options', () => {
   test.skip('version', () => {
     let capturedExitCode;
     let capturedOutput;
-    let oldProcessExit;
-    let oldProcessStdoutWrite;
 
     let prog = program()
       .version('0.0.1')
       .description('description');
 
     ['-V', '--version'].forEach(flag => {
-      capturedExitCode = -1;
-      capturedOutput = '';
-      oldProcessExit = process.exit;
-      oldProcessStdoutWrite = process.stdout.write;
-      process.exit = code => {
-        capturedExitCode = code;
-      };
-      process.stdout.write = output => {
-        capturedOutput += output;
-      };
       prog.init(['node', 'test', flag]);
-      process.exit = oldProcessExit;
-      process.stdout.write = oldProcessStdoutWrite;
       expect(capturedOutput).toEqual('0.0.1\n');
       expect(capturedExitCode).toEqual(0);
     });

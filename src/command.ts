@@ -455,7 +455,7 @@ export class Command extends EventEmitter {
   public option(
     flags: string,
     description: string,
-    fn?: Function | RegExp,
+    fn?: Function | RegExp | string | boolean,
     defaultValue?: any
   ): Command {
     const option = new Option(flags, description);
